@@ -1,7 +1,55 @@
 <mvc:View controllerName="zuitranpost.controller.Main"
-    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-        <content />
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:uiL="sap.ui.layout"
+    xmlns:uiT="sap.ui.table"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:sfb="sap.ui.comp.smartfilterbar"
+    xmlns:core="sap.ui.core"
+    height="100%">
+    <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
+        <dependents>
+        </dependents>
+        <content>
+            <VBox id="vbTranPost" fitContainer="true">
+                <sfb:SmartFilterBar id="sfbTranPost" entitySet="ZVB_3DERP_TRANPOST_FILTER" enableBasicSearch="true" search="onSearch" 
+                    persistencyKey="3DERP_TranPostKey" filterContainerWidth="14rem" useToolbar="true" showClearOnFB="true" initialise="onSFBInitialise">
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterSbu" key="SBU" groupId="_BASIC" label="{ddtext>/SBU}" controlType="dropDownList" filterType="single"
+                            displayBehaviour="idOnly" mandatory="mandatory" index="0">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterMoveType" key="MOVETYPE" groupId="_BASIC" label="{ddtext>/MVTTYPE}" controlType="dropDownList" 
+                            displayBehaviour="idAndDescription" mandatory="mandatory" index="1">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterIssPlant" key="ISSPLANT" groupId="_BASIC" label="{ddtext>/ISSPLANT}" controlType="dropDownList" 
+                            displayBehaviour="idOnly" mandatory="mandatory" index="2">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterRsvNo" key="RSVNO" groupId="_BASIC" label="{ddtext>/RSVNO}" controlType="dropDownList" 
+                            displayBehaviour="idOnly" mandatory="notMandatory" index="3">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterWarehouse" key="WAREHOUSE" groupId="_BASIC" label="{ddtext>/WAREHOUSE}" controlType="dropDownList" 
+                            displayBehaviour="idOnly" mandatory="notMandatory" index="5">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterSloc" key="SLOC" groupId="_BASIC" label="{ddtext>/SLOC}" controlType="dropDownList" 
+                            displayBehaviour="idOnly" mandatory="notMandatory" index="5">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:layoutData>
+                        <FlexItemData shrinkFactor="0"/>
+                    </sfb:layoutData>
+                </sfb:SmartFilterBar>
+            </VBox>
+        </content>
     </Page>
 </mvc:View>

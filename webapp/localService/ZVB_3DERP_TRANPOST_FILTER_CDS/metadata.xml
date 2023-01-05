@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZVB_3DERP_TRANPOST_FILTER_CDS" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="ZVB_3DERP_PLANT_SHType" sap:label="Plant" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="PLANTCD"/>
+                </Key>
+                <Property Name="PLANTCD" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:label="Plant"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_SBU_SHType" sap:label="3DERP: SBU" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SBU"/>
+                </Key>
+                <Property Name="SBU" Type="Edm.String" Nullable="false" MaxLength="5" sap:display-format="UpperCase" sap:label="SBU" sap:quickinfo="ERP SBU"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_TRANPOST_FILTERType" sap:label="Transfer Posting Filter" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="RsvNo"/>
+                    <PropertyRef Name="RsvYear"/>
+                    <PropertyRef Name="Item"/>
+                </Key>
+                <Property Name="RsvNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:label="Reservation" sap:quickinfo="Number of reservation/dependent requirements" sap:value-list="standard"/>
+                <Property Name="RsvYear" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="NonNegative" sap:label="Fiscal Year"/>
+                <Property Name="Item" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="NonNegative" sap:label="Item no." sap:quickinfo="Item Number of Reservation / Dependent Requirements"/>
+                <Property Name="SBU" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="SBU" sap:quickinfo="ERP SBU" sap:value-list="standard"/>
+                <Property Name="MOVETYPE" Type="Edm.String" MaxLength="3" sap:display-format="UpperCase" sap:label="Movement type" sap:quickinfo="Movement type (inventory management)" sap:value-list="standard"/>
+                <Property Name="ISSPLANT" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Plant" sap:value-list="standard"/>
+                <Property Name="WAREHOUSE" Type="Edm.String" MaxLength="10" sap:label="Warehouse Code" sap:value-list="standard"/>
+                <Property Name="SLOC" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Storage location" sap:value-list="standard"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_TRANPOST_MVTTYPE_SHType" sap:label="Transfer Posting Movement Type SH" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="MOVETYPE"/>
+                </Key>
+                <Property Name="MOVETYPE" Type="Edm.String" Nullable="false" MaxLength="3" sap:display-format="UpperCase" sap:text="DESCRIPTION" sap:label="Movement type" sap:quickinfo="Movement type (inventory management)"/>
+                <Property Name="DESCRIPTION" Type="Edm.String" MaxLength="50" sap:label="Short Description"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_TRANPOST_RSVNO_SHType" sap:label="Transfer Posting Rsv No SH" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="RSVNO"/>
+                </Key>
+                <Property Name="RSVNO" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:label="Reservation" sap:quickinfo="Number of reservation/dependent requirements"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_TRANPOST_SLOC_SHType" sap:label="Transfer Posting Sloc SH" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SLOC"/>
+                </Key>
+                <Property Name="SLOC" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:text="DESCRIPTION" sap:label="Storage location"/>
+                <Property Name="DESCRIPTION" Type="Edm.String" MaxLength="50" sap:label="Short Description"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_TRANPOST_WHSE_SHType" sap:label="Transfer Posting Warehouse SH" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="WAREHOUSE"/>
+                </Key>
+                <Property Name="WAREHOUSE" Type="Edm.String" Nullable="false" MaxLength="10" sap:label="Warehouse Code"/>
+                <Property Name="PLANTCD" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Plant"/>
+            </EntityType>
+            <EntityContainer Name="ZVB_3DERP_TRANPOST_FILTER_CDS_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="ZVB_3DERP_PLANT_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_PLANT_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_SBU_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_SBU_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_TRANPOST_FILTER" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_TRANPOST_MVTTYPE_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_MVTTYPE_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_TRANPOST_RSVNO_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_RSVNO_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_TRANPOST_SLOC_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_SLOC_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_TRANPOST_WHSE_SH" EntityType="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_WHSE_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/RsvNo" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Transfer Posting Rsv No SH"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_TRANPOST_RSVNO_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="RsvNo"/>
+                                    <PropertyValue Property="ValueListProperty" String="RSVNO"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/SBU" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="3DERP: SBU"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_SBU_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="SBU"/>
+                                    <PropertyValue Property="ValueListProperty" String="SBU"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/MOVETYPE" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Transfer Posting Movement Type SH"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_TRANPOST_MVTTYPE_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="MOVETYPE"/>
+                                    <PropertyValue Property="ValueListProperty" String="MOVETYPE"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/ISSPLANT" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Plant"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_PLANT_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="ISSPLANT"/>
+                                    <PropertyValue Property="ValueListProperty" String="PLANTCD"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/WAREHOUSE" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Transfer Posting Warehouse SH"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_TRANPOST_WHSE_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="WAREHOUSE"/>
+                                    <PropertyValue Property="ValueListProperty" String="WAREHOUSE"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="PLANTCD"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTERType/SLOC" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Transfer Posting Sloc SH"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_TRANPOST_SLOC_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="SLOC"/>
+                                    <PropertyValue Property="ValueListProperty" String="SLOC"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_TRANPOST_FILTER_CDS.ZVB_3DERP_TRANPOST_FILTER_CDS_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="None"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <atom:link rel="self" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZVB_3DERP_TRANPOST_FILTER_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZVB_3DERP_TRANPOST_FILTER_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

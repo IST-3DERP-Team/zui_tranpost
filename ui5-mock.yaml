@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
-
 specVersion: "2.5"
 metadata:
   name: zuitranpost
@@ -9,7 +7,7 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertError: false
         ui5:
           path:
             - /resources
@@ -18,7 +16,7 @@ server:
         backend:
           - path: /sap
             url: http://159.138.39.203:8000
-            client: '888'
+            client: "888"
             destination: LTD888
     - name: fiori-tools-appreload
       afterMiddleware: compression
@@ -31,8 +29,20 @@ server:
       configuration:
         mountPath: /
         services:
-          - urlPath: /sap/opu/odata/sap/ZGW_3DERP_TRANPOST_SRV
-            metadataPath: ./webapp/localService/metadata.xml
-            mockdataPath: ./webapp/localService/data
+          - urlPath: /sap/opu/odata/sap/ZGW_3DERP_TRANPOST_SRV/
+            generateMockData: true
+            metadataXmlPath: ./webapp/localService/mainService/metadata.xml
+            mockdataRootPath: ./webapp/localService/data
+          - urlPath: /sap/opu/odata/sap/ZVB_3DERP_TRANPOST_FILTER_CDS/
+            generateMockData: true
+            metadataXmlPath: ./webapp/localService/ZVB_3DERP_TRANPOST_FILTER_CDS/metadata.xml
+            mockdataRootPath: ./webapp/localService/ZVB_3DERP_TRANPOST_FILTER_CDS/mockdata
+          - urlPath: /sap/opu/odata/sap/ZGW_3DERP_COMMON_SRV/
+            generateMockData: true
+            metadataXmlPath: ./webapp/localService/ZGW_3DERP_COMMON_SRV/metadata.xml
+            mockdataRootPath: ./webapp/localService/ZGW_3DERP_COMMON_SRV/mockdata
+          - urlPath: /sap/opu/odata/sap/ZGW_3DERP_RFC_SRV
+            metadataPath: ./webapp/localService/ZGW_3DERP_RFC_SRV/metadata.xml
+            mockdataPath: ./webapp/localService/ZGW_3DERP_RFC_SRV/mockdata
             generateMockData: true
         annotations: []
