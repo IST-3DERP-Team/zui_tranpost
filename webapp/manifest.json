@@ -20,9 +20,9 @@
                 "uri": "/sap/opu/odata/sap/ZGW_3DERP_TRANPOST_SRV/",
                 "type": "OData",
                 "settings": {
+                    "odataVersion": "2.0",
                     "annotations": [],
-                    "localUri": "localService/mainService/metadata.xml",
-                    "odataVersion": "2.0"
+                    "localUri": "localService/mainService/metadata.xml"
                 }
             },
             "ZVB_3DERP_TRANPOST_FILTER_CDS_Annotation": {
@@ -108,7 +108,11 @@
             "": {
                 "dataSource": "mainService",
                 "preload": true,
-                "settings": {}
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false
+                }
             },
             "ZVB_3DERP_TRANPOST_FILTER_CDS": {
                 "dataSource": "ZVB_3DERP_TRANPOST_FILTER_CDS",
@@ -162,6 +166,22 @@
                     "target": [
                         "TargetMain"
                     ]
+                },
+                {
+                    "name": "RouteTo",
+                    "pattern": "To",
+                    "greedy": false,
+                    "target": [
+                        "TargetTo"
+                    ]
+                },
+                {
+                    "name": "RouteMatDoc",
+                    "pattern": "MatDoc",
+                    "greedy": false,
+                    "target": [
+                        "TargetMatDoc"
+                    ]
                 }
             ],
             "targets": {
@@ -171,6 +191,20 @@
                     "clearControlAggregation": false,
                     "viewId": "Main",
                     "viewName": "Main"
+                },
+                "TargetTo": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "To",
+                    "viewName": "To"
+                },
+                "TargetMatDoc": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "MatDoc",
+                    "viewName": "MatDoc"
                 }
             }
         },
@@ -179,6 +213,9 @@
             "type": "XML",
             "async": true,
             "id": "App"
+        },
+        "config": {
+            "fullWidth": true
         }
     }
 }

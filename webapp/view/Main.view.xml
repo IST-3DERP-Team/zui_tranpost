@@ -22,12 +22,12 @@
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterMoveType" key="MOVETYPE" groupId="_BASIC" label="{ddtext>/MVTTYPE}" controlType="dropDownList" 
-                            displayBehaviour="idAndDescription" mandatory="mandatory" index="1">
+                            displayBehaviour="idAndDescription" mandatory="notMandatory" index="1">
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterIssPlant" key="ISSPLANT" groupId="_BASIC" label="{ddtext>/ISSPLANT}" controlType="dropDownList" 
-                            displayBehaviour="idOnly" mandatory="mandatory" index="2">
+                            displayBehaviour="idOnly" mandatory="notMandatory" index="2">
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
@@ -49,6 +49,42 @@
                         <FlexItemData shrinkFactor="0"/>
                     </sfb:layoutData>
                 </sfb:SmartFilterBar>
+
+                <uiT:Table id="tranPostTab"
+                    class="tablePadding"
+                    rows="{tranPost>/results}"
+                    visibleRowCountMode="Auto"
+                    showColumnVisibilityMenu="true"
+                    enableColumnFreeze="true"
+                    enableCellFilter="true"
+                    selectionMode="MultiToggle"
+                    firstVisibleRowChanged="onFirstVisibleRowChanged"
+                    cellClick="onCellClick"
+                    sort="onSorted"
+                    filter="onFilter"
+                    columnFreeze="onColumnUpdated"
+                    columnMove="onColumnUpdated"
+                    columnResize="onColumnUpdated"
+                    columnSelect="onColumnUpdated"
+                    columnVisibility="onColumnUpdated"
+                    rowSelectionChange="onRowSelectionChange">
+                    <uiT:extension>
+                        <Toolbar>
+                            <ToolbarSpacer/>
+                            <Button id="btnAdd" 
+                                icon="sap-icon://add"
+                                press="onAdd"
+                                visible="true"/>
+                            <Button id="btnRefresh" 
+                                icon="sap-icon://refresh"
+                                press="onRefresh" 
+                                visible="true" />
+                        </Toolbar>
+                    </uiT:extension>
+                    <uiT:layoutData>
+                        <FlexItemData growFactor="1" baseSize="0%"/>
+                    </uiT:layoutData>
+                </uiT:Table>
             </VBox>
         </content>
     </Page>
