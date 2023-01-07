@@ -1,21 +1,28 @@
 sap.ui.define([
-    "./BaseController"
+    "./BaseController",
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
+    "sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
+    'sap/ui/model/Sorter',
+    "sap/ui/Device",
+    "sap/ui/table/library",
+    "sap/m/TablePersoController",
+    'sap/m/MessageToast',
+	'sap/m/SearchField'
 ],
-    function (BaseController) {
+    function (BaseController, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, TablePersoController, MessageToast, SearchField) {
         "use strict";
 
         var _this;
+        var _oCaption = {};
         var _aSmartFilter;
         var _sSmartFilterGlobal;
 
         return BaseController.extend("zuitranpost.controller.Main", {
             onInit: function () {
                 _this = this;
-                _this.onInitBase(_this, "VER");
-
-                _this.showLoadingDialog("Loading...");
-
-                _this._aColumns = {};
 
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
@@ -24,6 +31,16 @@ sap.ui.define([
             },
 
             initializeComponent() {
+                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                    sbu: "VER" // temporary Sbu
+                }), "ui");
+
+                _this._aColumns = {};
+                this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
+
+                _this.showLoadingDialog("Loading...");
+                _this.getCaption();
+
                 var aTableList = [];
                 aTableList.push({
                     modCode: "TRANPOSTMOD",
@@ -53,6 +70,9 @@ sap.ui.define([
                 
                 _aSmartFilter = aSmartFilter;
                 _sSmartFilterGlobal = sSmartFilterGlobal;
+
+                console.log("onsearch", aSmartFilter);
+
                 this.getTranPost(aSmartFilter, sSmartFilterGlobal);
 
                 this.byId("btnAdd").setEnabled(true);
@@ -116,11 +136,69 @@ sap.ui.define([
             },
 
             onAdd() {
-                console.log("add")
+                var oTable = this.byId("tranPostTab");
+                var aSelIdx = oTable.getSelectedIndices();
+
+                if (aSelIdx.length === 0) {
+                    sap.m.MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
+                    return;
+                }
+
+                var aOrigSelIdx = [];
+                aSelIdx.forEach(i => {
+                    aOrigSelIdx.push(oTable.getBinding("rows").aIndices[i]);
+                })
+
+                var aData = _this.getView().getModel("tranPost").getData().results;
+                var sRsvList = "";
+
+                aOrigSelIdx.forEach(i => {
+                    var oData = aData[i];
+                    sRsvList += oData.RSVNO + "+" + oData.RSVYEAR + "+" + oData.ITEM + ",";
+                })
+
+                if (sRsvList.length > 0) sRsvList = sRsvList.slice(0, -1);
+
                 this._router.navTo("RouteTo", {
-                    
+                    sbu: _this.getView().getModel("ui").getData().sbu,
+                    rsvList: sRsvList
                 });
-                console.log("add2")
+            },
+
+            getCaption() {
+                var oJSONModel = new sap.ui.model.json.JSONModel();
+                var oDDTextParam = [];
+                var oDDTextResult = {};
+                var oModel = this.getOwnerComponent().getModel("ZGW_3DERP_COMMON_SRV");
+                
+                // Smart Filter
+                oDDTextParam.push({CODE: "SBU"});
+                oDDTextParam.push({CODE: "MVTTYPE"});
+                oDDTextParam.push({CODE: "ISSPLANT"});
+                oDDTextParam.push({CODE: "RSVNO"});
+                oDDTextParam.push({CODE: "WAREHOUSE"});
+                oDDTextParam.push({CODE: "SLOC"});
+
+                // MessageBox
+                oDDTextParam.push({CODE: "INFO_NO_RECORD_SELECT"});
+                
+                oModel.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
+                    method: "POST",
+                    success: function(oData, oResponse) {
+                        oData.CaptionMsgItems.results.forEach(item => {
+                            oDDTextResult[item.CODE] = item.TEXT;
+                        })
+
+                        oJSONModel.setData(oDDTextResult);
+                        _this.getView().setModel(oJSONModel, "caption");
+
+                        _oCaption = _this.getView().getModel("caption").getData();
+                    },
+                    error: function(err) {
+                        sap.m.MessageBox.error(err);
+                        _this.closeLoadingDialog();
+                    }
+                });
             }
         });
     });

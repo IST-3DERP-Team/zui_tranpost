@@ -29,10 +29,6 @@ sap.ui.define([
             _this = pThis;
             _sSbu = pSbu;
         },
-
-        getSbu() {
-            return _sSbu;
-        },
    
         getColumns: async function(pTableList) {
             _aTable = pTableList;
@@ -205,7 +201,6 @@ sap.ui.define([
             var aFilterGrp = [];
             var aFilterCol = [];
 
-            console.log("onFilterBySmart", pFilters);
             if (pFilters.length > 0 && pFilters[0].aFilters) {
                 pFilters[0].aFilters.forEach(x => {
                     if (Object.keys(x).includes("aFilters")) {

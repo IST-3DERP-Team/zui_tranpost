@@ -1,10 +1,22 @@
 sap.ui.define([
-    "./BaseController"
+    "./BaseController",
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
+    "sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
+    'sap/ui/model/Sorter',
+    "sap/ui/Device",
+    "sap/ui/table/library",
+    "sap/m/TablePersoController",
+    'sap/m/MessageToast',
+	'sap/m/SearchField'
 ],
-    function (BaseController) {
+    function (BaseController, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, TablePersoController, MessageToast, SearchField) {
         "use strict";
 
         var _this;
+        var _oCaption = {};
 
         return BaseController.extend("zuitranpost.controller.To", {
             onInit: function () {
@@ -18,7 +30,6 @@ sap.ui.define([
             },
 
             _routePatternMatched: function (oEvent) {
-                _this.showLoadingDialog("Loading...");
                 _this.initializeComponent();
             },
 

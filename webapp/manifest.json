@@ -169,7 +169,7 @@
                 },
                 {
                     "name": "RouteTo",
-                    "pattern": "To",
+                    "pattern": "To/{sbu},{rsvList}",
                     "greedy": false,
                     "target": [
                         "TargetTo"
