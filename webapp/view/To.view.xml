@@ -14,6 +14,42 @@
         </dependents>
         <content>
             <VBox id="vbTranPost" fitContainer="true">
+                <f:Form id="frmHeader" editable="true" class="sapUiNoContentPadding" width="100%">
+                    <f:layout>
+                        <f:ResponsiveGridLayout columnsL="2" singleContainerFullSize="false" />
+                    </f:layout>
+                    <f:formContainers>
+                        <f:FormContainer ariaLabelledBy="Grp1" class="sapUiNoContentPadding" >
+                            <f:formElements>
+                                <f:FormElement id="feDocDt" label="{caption>/DOCDT}">  
+                                    <f:fields>
+                                        <DatePicker id="dpDocDt" width="80%"/>
+                                    </f:fields>
+                                </f:FormElement>
+                                <f:FormElement id="fePostDt" label="{caption>/POSTDT}">  
+                                    <f:fields>
+                                        <DatePicker id="dpPostDt" width="80%"/>
+                                    </f:fields>
+                                </f:FormElement>
+                            </f:formElements>
+                        </f:FormContainer>
+                        <f:FormContainer ariaLabelledBy="Grp2" class="sapUiNoContentPadding" >
+                            <f:formElements>
+                                <f:FormElement label="{caption>/MATSLIP}">  
+                                    <f:fields>
+                                        <Input id="iptMatSlip" width="80%"/>
+                                    </f:fields>
+                                </f:FormElement>
+                                <f:FormElement label="{caption>/HDRTXT}">  
+                                    <f:fields>
+                                        <Input id="iptHdrTxt" width="80%"/>
+                                    </f:fields>
+                                </f:FormElement>
+                            </f:formElements>
+                        </f:FormContainer>
+                    </f:formContainers>
+                </f:Form>
+
                 <uiT:Table id="toTab"
                     class="tablePadding"
                     rows="{to>/results}"

@@ -1,6 +1,5 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
@@ -31,7 +30,7 @@ sap.ui.define([
             },
 
             initializeComponent() {
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                this.getView().setModel(new JSONModel({
                     sbu: "VER" // temporary Sbu
                 }), "ui");
 
@@ -100,7 +99,7 @@ sap.ui.define([
                                 aFilterTab = oTable.getBinding("rows").aFilters;
                             }
 
-                            var oJSONModel = new sap.ui.model.json.JSONModel();
+                            var oJSONModel = new JSONModel();
                             oJSONModel.setData(data);
                             _this.getView().setModel(oJSONModel, "tranPost");
                             _this._tableRendered = "tranPostTab";
@@ -140,7 +139,7 @@ sap.ui.define([
                 var aSelIdx = oTable.getSelectedIndices();
 
                 if (aSelIdx.length === 0) {
-                    sap.m.MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
+                    MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
                     return;
                 }
 
@@ -154,7 +153,7 @@ sap.ui.define([
 
                 aOrigSelIdx.forEach(i => {
                     var oData = aData[i];
-                    sRsvList += oData.RSVNO + "+" + oData.RSVYEAR + "+" + oData.ITEM + ",";
+                    sRsvList += oData.RSVNO + oData.RSVYEAR + oData.ITEM + "+";
                 })
 
                 if (sRsvList.length > 0) sRsvList = sRsvList.slice(0, -1);
@@ -166,36 +165,36 @@ sap.ui.define([
             },
 
             getCaption() {
-                var oJSONModel = new sap.ui.model.json.JSONModel();
-                var oDDTextParam = [];
-                var oDDTextResult = {};
+                var oJSONModel = new JSONModel();
+                var oCaptionParam = [];
+                var oCaptionResult = {};
                 var oModel = this.getOwnerComponent().getModel("ZGW_3DERP_COMMON_SRV");
                 
                 // Smart Filter
-                oDDTextParam.push({CODE: "SBU"});
-                oDDTextParam.push({CODE: "MVTTYPE"});
-                oDDTextParam.push({CODE: "ISSPLANT"});
-                oDDTextParam.push({CODE: "RSVNO"});
-                oDDTextParam.push({CODE: "WAREHOUSE"});
-                oDDTextParam.push({CODE: "SLOC"});
+                oCaptionParam.push({CODE: "SBU"});
+                oCaptionParam.push({CODE: "MVTTYPE"});
+                oCaptionParam.push({CODE: "ISSPLANT"});
+                oCaptionParam.push({CODE: "RSVNO"});
+                oCaptionParam.push({CODE: "WAREHOUSE"});
+                oCaptionParam.push({CODE: "SLOC"});
 
                 // MessageBox
-                oDDTextParam.push({CODE: "INFO_NO_RECORD_SELECT"});
+                oCaptionParam.push({CODE: "INFO_NO_RECORD_SELECT"});
                 
-                oModel.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
+                oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",
                     success: function(oData, oResponse) {
                         oData.CaptionMsgItems.results.forEach(item => {
-                            oDDTextResult[item.CODE] = item.TEXT;
+                            oCaptionResult[item.CODE] = item.TEXT;
                         })
 
-                        oJSONModel.setData(oDDTextResult);
+                        oJSONModel.setData(oCaptionResult);
                         _this.getView().setModel(oJSONModel, "caption");
 
                         _oCaption = _this.getView().getModel("caption").getData();
                     },
                     error: function(err) {
-                        sap.m.MessageBox.error(err);
+                        MessageBox.error(err);
                         _this.closeLoadingDialog();
                     }
                 });

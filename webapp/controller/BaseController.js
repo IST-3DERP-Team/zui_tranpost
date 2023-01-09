@@ -249,12 +249,32 @@ sap.ui.define([
 
             this.byId(pModel + "Tab").getBinding("rows").filter(oFilter, "Application");
 
+            // Filter by Table columns
+            _this.onFilterByCol(pModel, pFilterTab);
+        },
+
+        onFilterByCol(pModel, pFilterTab) {
             if (pFilterTab.length > 0) {
                 pFilterTab.forEach(item => {
                     var iColIdx = _this._aColumns[pModel].findIndex(x => x.name == item.sPath);
                     _this.getView().byId(pModel + "Tab").filter(_this.getView().byId(pModel + "Tab").getColumns()[iColIdx], 
                         item.oValue1);
                 });
+            }
+        },
+
+        clearSortFilter(pTable) {
+            var oTable = this.byId(pTable);
+            var oColumns = oTable.getColumns();
+            for (var i = 0, l = oColumns.length; i < l; i++) {
+
+                if (oColumns[i].getFiltered()) {
+                    oColumns[i].filter("");
+                }
+
+                if (oColumns[i].getSorted()) {
+                    oColumns[i].setSorted(false);
+                }
             }
         },
    

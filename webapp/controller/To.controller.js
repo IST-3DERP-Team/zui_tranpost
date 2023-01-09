@@ -1,6 +1,5 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
@@ -21,8 +20,6 @@ sap.ui.define([
         return BaseController.extend("zuitranpost.controller.To", {
             onInit: function () {
                 _this = this;
-
-                _this._aColumns = {};
                 
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
@@ -30,10 +27,21 @@ sap.ui.define([
             },
 
             _routePatternMatched: function (oEvent) {
+                this.getView().setModel(new JSONModel({
+                    sbu: oEvent.getParameter("arguments").sbu,
+                    rsvList: oEvent.getParameter("arguments").rsvList
+                }), "ui");
+
                 _this.initializeComponent();
             },
 
             initializeComponent() {
+                _this._aColumns = {};
+                this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
+
+                _this.showLoadingDialog("Loading...");
+                _this.getCaption();
+
                 var aTableList = [];
                 aTableList.push({
                     modCode: "TRANPOSTTOMOD",
@@ -42,87 +50,168 @@ sap.ui.define([
                     tblModel: "to"
                 });
 
-                // aTableList.push({
-                //     modCode: "TRANPOSTHUMOD",
-                //     tblSrc: "ZDV_TRANSPOST_HU",
-                //     tblId: "huTab",
-                //     tblModel: "hu"
-                // });
+                aTableList.push({
+                    modCode: "TRANPOSTHUMOD",
+                    tblSrc: "ZDV_TRANSPOST_HU",
+                    tblId: "huTab",
+                    tblModel: "hu"
+                });
 
                 _this.getColumns(aTableList);
+                _this.getTo();
 
                 _this.closeLoadingDialog();
             },
 
-            // onSearch(oEvent) {
-            //     this.showLoadingDialog("Loading...");
+            getTo() {
+                _this.showLoadingDialog("Loading...");
 
-            //     var aSmartFilter = this.getView().byId("sfbTranPost").getFilters();
-            //     var sSmartFilterGlobal = "";
-            //     if (oEvent) sSmartFilterGlobal = oEvent.getSource()._oBasicSearchField.mProperties.value;
+                var oTable = _this.getView().byId("toTab");
+                var oModel = _this.getOwnerComponent().getModel();
+                var aRsvList = _this.getView().getModel("ui").getData().rsvList.toString().split("+");
+                var aRsvData = [];
+
+                aRsvList.forEach((item, idx) => {
+                    var sFilter = "RSVKEY eq '" + item + "'";
+                    oModel.read('/TOSet', {
+                        urlParameters: {
+                            "$filter": sFilter
+                        },
+                        success: function (data, response) {
+                            aRsvData.push(data.results[0]);
+
+                            if (idx == (aRsvList.length -1)) {
+                                console.log("TOSet", aRsvData)
+
+                                var aFilterTab = [];
+                                if (oTable.getBinding("rows")) {
+                                    aFilterTab = oTable.getBinding("rows").aFilters;
+                                }
+
+                                var oJSONModel = new JSONModel();
+                                oJSONModel.setData({
+                                    results: aRsvData
+                                });
+
+                                _this.getView().setModel(oJSONModel, "to");
+                                _this._tableRendered = "toTab";
+                                _this.onFilterByCol("to", aFilterTab);
+
+                                _this.setRowReadMode("to");
+
+                                oTable.getColumns().forEach((col, idx) => {   
+                                    if (col._oSorter) {
+                                        oTable.sort(col, col.mProperties.sortOrder === "Ascending" ? SortOrder.Ascending : SortOrder.Descending, true);
+                                    }
+                                });
+
+                                _this.closeLoadingDialog();
+                            }
+                        },
+                        error: function (err) { 
+                            console.log("error", err)
+                            _this.closeLoadingDialog();
+                        }
+                    })
+                })
+            },
+
+            getHu() {
+                var oModel = _this.getOwnerComponent().getModel();
+
+
+                aRsvList.forEach((item, idx) => {
+                    var sFilter = "RSVKEY eq '" + item + "'";
+                    oModel.read('/TOSet', {
+                        urlParameters: {
+                            "$filter": sFilter
+                        },
+                        success: function (data, response) {
+                            aRsvData.push(data.results[0]);
+
+                            if (idx == (aRsvList.length -1)) {
+                                console.log("TOSet", aRsvData)
+
+                                var aFilterTab = [];
+                                if (oTable.getBinding("rows")) {
+                                    aFilterTab = oTable.getBinding("rows").aFilters;
+                                }
+
+                                var oJSONModel = new JSONModel();
+                                oJSONModel.setData({
+                                    results: aRsvData
+                                });
+
+                                _this.getView().setModel(oJSONModel, "to");
+                                _this._tableRendered = "toTab";
+                                _this.onFilterByCol("to", aFilterTab);
+
+                                _this.setRowReadMode("to");
+
+                                oTable.getColumns().forEach((col, idx) => {   
+                                    if (col._oSorter) {
+                                        oTable.sort(col, col.mProperties.sortOrder === "Ascending" ? SortOrder.Ascending : SortOrder.Descending, true);
+                                    }
+                                });
+
+                                _this.closeLoadingDialog();
+                            }
+                        },
+                        error: function (err) { 
+                            console.log("error", err)
+                            _this.closeLoadingDialog();
+                        }
+                    })
+                })
+            },
+
+            onCellClickTo(oEvent) {
+                var sIssPlant = oEvent.getParameters().rowBindingContext.getObject().ISSPLANT;
+                var sIssSloc = oEvent.getParameters().rowBindingContext.getObject().ISSSLOC;
+                var sIssMatNo = oEvent.getParameters().rowBindingContext.getObject().ISSMATNO;
+                var sIssBatch = oEvent.getParameters().rowBindingContext.getObject().ISSBATCH;
+
+                this.getView().getModel("ui").setProperty("/issPlant", sIssPlant);
+                this.getView().getModel("ui").setProperty("/issSloc", sIssSloc);
+                this.getView().getModel("ui").setProperty("/issMatNo", sIssMatNo);
+                this.getView().getModel("ui").setProperty("/issBatch", sIssBatch);
+
+                this.getHu();
+                this.clearSortFilter("huTab");
+            },
+
+            getCaption() {
+                var oJSONModel = new JSONModel();
+                var oCaptionParam = [];
+                var oCaptionResult = {};
+                var oModel = this.getOwnerComponent().getModel("ZGW_3DERP_COMMON_SRV");
+
+                // Form
+                oCaptionParam.push({CODE: "DOCDT"});
+                oCaptionParam.push({CODE: "POSTDT"});
+                oCaptionParam.push({CODE: "MATSLIP"});
+                oCaptionParam.push({CODE: "HDRTXT"});
+
+                // MessageBox
+                oCaptionParam.push({CODE: "INFO_NO_RECORD_SELECT"});
                 
-            //     _aSmartFilter = aSmartFilter;
-            //     _sSmartFilterGlobal = sSmartFilterGlobal;
-            //     this.getTranPost(aSmartFilter, sSmartFilterGlobal);
+                oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
+                    method: "POST",
+                    success: function(oData, oResponse) {
+                        oData.CaptionMsgItems.results.forEach(item => {
+                            oCaptionResult[item.CODE] = item.TEXT;
+                        })
 
-            //     this.byId("btnAdd").setEnabled(true);
-            //     this.byId("btnRefresh").setEnabled(true);
-            // },
+                        oJSONModel.setData(oCaptionResult);
+                        _this.getView().setModel(oJSONModel, "caption");
 
-            // getTranPost(pFilters, pFilterGlobal) {
-            //     _this.showLoadingDialog("Loading...");
-
-            //     var oModel = this.getOwnerComponent().getModel();
-            //     var oTable = _this.getView().byId("tranPostTab");
-
-            //     oModel.read('/MRSet', {
-            //         success: function (data, response) {
-            //             console.log("MRSet", data)
-            //             if (data.results.length > 0) {
-
-            //                 data.results.forEach(item => {
-            //                     if (item.CREATEDDT !== null)
-            //                         item.CREATEDDT = _this.formatDate(item.CREATEDDT);
-            //                 })
-
-            //                 var aFilterTab = [];
-            //                 if (oTable.getBinding("rows")) {
-            //                     aFilterTab = oTable.getBinding("rows").aFilters;
-            //                 }
-
-            //                 var oJSONModel = new sap.ui.model.json.JSONModel();
-            //                 oJSONModel.setData(data);
-            //                 _this.getView().setModel(oJSONModel, "tranPost");
-            //                 _this._tableRendered = "tranPostTab";
-
-            //                 _this.onFilterBySmart("tranPost", pFilters, pFilterGlobal, aFilterTab);
-
-            //                 _this.setRowReadMode("tranPost");
-            //             }
-
-            //             oTable.getColumns().forEach((col, idx) => {   
-            //                 if (col._oSorter) {
-            //                     oTable.sort(col, col.mProperties.sortOrder === "Ascending" ? SortOrder.Ascending : SortOrder.Descending, true);
-            //                 }
-            //             });
-
-            //             // if (oTable.getBinding("rows").aIndices.length > 0) {
-            //             //     var aIndices = oTable.getBinding("rows").aIndices;
-            //             //     var sDlvNo = _this.getView().getModel("outDelHdr").getData().results[aIndices[0]].DLVNO;
-            //             //     _this.getView().getModel("ui").setProperty("/activeDlvNo", sDlvNo);
-            //             //     _this.getOutDelDtl();
-            //             // } else {
-            //             //     _this.getView().getModel("ui").setProperty("/activeDlvNo", "");
-            //             //     _this.getView().getModel("outDelDtl").setProperty("/results", []);
-            //             // }
-                        
-            //             _this.closeLoadingDialog();
-            //         },
-            //         error: function (err) { 
-            //             console.log("error", err)
-            //             _this.closeLoadingDialog();
-            //         }
-            //     })
-            // }
+                        _oCaption = _this.getView().getModel("caption").getData();
+                    },
+                    error: function(err) {
+                        MessageBox.error(err);
+                        _this.closeLoadingDialog();
+                    }
+                });
+            }
         });
     });
