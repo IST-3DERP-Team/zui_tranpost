@@ -195,6 +195,74 @@ sap.ui.define([
             })
         },
 
+        setRowEditMode(pModel) {
+            console.log("setRowEditMode", pModel, this._aColumns[pModel])
+            this.getView().getModel(pModel).getData().results.forEach(item => item.Edited = false);
+
+            var oTable = this.byId(pModel + "Tab");
+
+            oTable.getColumns().forEach((col, idx) => {
+                this._aColumns[pModel].filter(item => item.label === col.getLabel().getText())
+                    .forEach(ci => {
+                        if (!ci.hideOnChange && ci.updatable) {
+                            if (ci.type === "BOOLEAN") {
+                                col.setTemplate(new sap.m.CheckBox({selected: "{" + pModel + ">" + ci.name + "}", editable: true}));
+                            }
+                            else if (ci.valueHelp["show"]) {
+                                col.setTemplate(new sap.m.Input({
+                                    // id: "ipt" + ci.name,
+                                    type: "Text",
+                                    value: "{" + pModel + ">" + ci.name + "}",
+                                    maxLength: +ci.maxLength,
+                                    showValueHelp: true,
+                                    valueHelpRequest: this.handleValueHelp.bind(this),
+                                    showSuggestion: true,
+                                    maxSuggestionWidth: ci.valueHelp["suggestionItems"].additionalText !== undefined ? ci.valueHelp["suggestionItems"].maxSuggestionWidth : "1px",
+                                    suggestionItems: {
+                                        path: ci.valueHelp["items"].path,
+                                        length: 1000,
+                                        template: new sap.ui.core.ListItem({
+                                            key: "{" + ci.valueHelp["items"].value + "}",
+                                            text: "{" + ci.valueHelp["items"].value + "}",
+                                            additionalText: ci.valueHelp["suggestionItems"].additionalText !== undefined ? ci.valueHelp["suggestionItems"].additionalText : '',
+                                        }),
+                                        templateShareable: false
+                                    },
+                                    change: this.onValueHelpLiveInputChange.bind(this)
+                                }));
+                            }
+                            else if (ci.type === "NUMBER") {
+                                col.setTemplate(new sap.m.Input({
+                                    type: sap.m.InputType.Number,
+                                    textAlign: sap.ui.core.TextAlign.Right,
+                                    value: "{path:'" + pModel + ">" + ci.name + "', type:'sap.ui.model.odata.type.Decimal', formatOptions:{ minFractionDigits:" + ci.scale + ", maxFractionDigits:" + ci.scale + " }, constraints:{ precision:" + ci.precision + ", scale:" + ci.scale + " }}",
+                                    liveChange: this.onNumberLiveChange.bind(this)
+                                }));
+                            }
+                            else {
+                                if (ci.maxLength !== null) {
+                                    col.setTemplate(new sap.m.Input({
+                                        value: "{" + pModel + ">" + ci.name + "}",
+                                        maxLength: +ci.maxLength,
+                                        liveChange: this.onInputLiveChange.bind(this)
+                                    }));
+                                }
+                                else {
+                                    col.setTemplate(new sap.m.Input({
+                                        value: "{" + pModel + ">" + ci.name + "}",
+                                        liveChange: this.onInputLiveChange.bind(this)
+                                    }));
+                                }
+                            }                                
+                        }
+
+                        if (ci.required) {
+                            col.getLabel().addStyleClass("requiredField");
+                        }
+                    })
+            })
+        },
+
         onFilterBySmart(pModel, pFilters, pFilterGlobal, pFilterTab) {
             var oFilter = null;
             var aFilter = [];

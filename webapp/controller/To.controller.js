@@ -16,10 +16,30 @@ sap.ui.define([
 
         var _this;
         var _oCaption = {};
+        var _aHu = [];
 
         return BaseController.extend("zuitranpost.controller.To", {
             onInit: function () {
                 _this = this;
+
+                _this.getCaption();
+
+                var aTableList = [];
+                aTableList.push({
+                    modCode: "TRANPOSTTOMOD",
+                    tblSrc: "ZDV_TRANSPOST_TO",
+                    tblId: "toTab",
+                    tblModel: "to"
+                });
+
+                aTableList.push({
+                    modCode: "TRANPOSTHUMOD",
+                    tblSrc: "ZDV_TRANSPOST_HU",
+                    tblId: "huTab",
+                    tblModel: "hu"
+                });
+
+                _this.getColumns(aTableList);
                 
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
@@ -40,25 +60,11 @@ sap.ui.define([
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
 
                 _this.showLoadingDialog("Loading...");
-                _this.getCaption();
-
-                var aTableList = [];
-                aTableList.push({
-                    modCode: "TRANPOSTTOMOD",
-                    tblSrc: "ZDV_TRANSPOST_TO",
-                    tblId: "toTab",
-                    tblModel: "to"
-                });
-
-                aTableList.push({
-                    modCode: "TRANPOSTHUMOD",
-                    tblSrc: "ZDV_TRANSPOST_HU",
-                    tblId: "huTab",
-                    tblModel: "hu"
-                });
-
-                _this.getColumns(aTableList);
                 _this.getTo();
+
+                var sCurrentDate = _this.formatDate(new Date());
+                _this.byId("dpDocDt").setValue(sCurrentDate);
+                _this.byId("dpPostDt").setValue(sCurrentDate);
 
                 _this.closeLoadingDialog();
             },
@@ -118,51 +124,167 @@ sap.ui.define([
 
             getHu() {
                 var oModel = _this.getOwnerComponent().getModel();
+                var sPlant = _this.getView().getModel("ui").getData().issPlant;
+                var sSloc = _this.getView().getModel("ui").getData().issSloc;
+                var sMatNo = _this.getView().getModel("ui").getData().issMatNo;
+                var sIssBatch = _this.getView().getModel("ui").getData().issBatch;
 
+                var sFilter = "PLANTCD eq '" + sPlant + "' and SLOC eq '" + sSloc + "' and MATNO eq '" + sMatNo + 
+                                "' and BATCH eq '" + sIssBatch + "'";
+                oModel.read('/HUSet', {
+                    urlParameters: {
+                        "$filter": sFilter
+                    },
+                    success: function (data, response) {
+                        console.log("HUSet", data)
 
-                aRsvList.forEach((item, idx) => {
-                    var sFilter = "RSVKEY eq '" + item + "'";
-                    oModel.read('/TOSet', {
-                        urlParameters: {
-                            "$filter": sFilter
-                        },
-                        success: function (data, response) {
-                            aRsvData.push(data.results[0]);
-
-                            if (idx == (aRsvList.length -1)) {
-                                console.log("TOSet", aRsvData)
-
-                                var aFilterTab = [];
-                                if (oTable.getBinding("rows")) {
-                                    aFilterTab = oTable.getBinding("rows").aFilters;
+                        if (data.results.length > 0) {
+                            data.results.forEach(item => {
+                                var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
+                                if (aHu.length > 0) {
+                                    item.TOQTY = aHu[0].toQty;
                                 }
+                            })
+                        }
 
-                                var oJSONModel = new JSONModel();
-                                oJSONModel.setData({
-                                    results: aRsvData
-                                });
+                        var oJSONModel = new JSONModel();
+                        oJSONModel.setData(data);
+                        _this.getView().setModel(oJSONModel, "hu");
+                        _this._tableRendered = "huTab";
+                        _this.setRowReadMode("hu");
+                    },
+                    error: function (err) { 
+                        console.log("error", err)
+                        _this.closeLoadingDialog();
+                    }
+                })
+            },
 
-                                _this.getView().setModel(oJSONModel, "to");
-                                _this._tableRendered = "toTab";
-                                _this.onFilterByCol("to", aFilterTab);
+            onEditHu() {
+                var aRows = this.getView().getModel("hu").getData().results;
+                
+                if (aRows.length > 0) {
+                    this.byId("btnEditHu").setVisible(false);
+                    this.byId("btnRefreshHu").setVisible(false);
+                    this.byId("btnSaveHu").setVisible(true);
+                    this.byId("btnCancelHu").setVisible(true);
 
-                                _this.setRowReadMode("to");
+                    this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("hu").getData());
+                    this.setRowEditMode("hu");
+                } else {
+                    MessageBox.warning(_oCaption.INFO_NO_DATA_EDIT);
+                }
+            },
 
-                                oTable.getColumns().forEach((col, idx) => {   
-                                    if (col._oSorter) {
-                                        oTable.sort(col, col.mProperties.sortOrder === "Ascending" ? SortOrder.Ascending : SortOrder.Descending, true);
-                                    }
-                                });
+            onRefreshHu() {
+                _this.getHu();
+            },
 
-                                _this.closeLoadingDialog();
-                            }
-                        },
-                        error: function (err) { 
-                            console.log("error", err)
-                            _this.closeLoadingDialog();
+            onSaveHu() {
+                var oTable = this.byId("huTab");
+                var aEditedRows = this.getView().getModel("hu").getData().results.filter(item => item.Edited === true);
+
+                if (aEditedRows.length > 0) {
+                    aEditedRows.forEach((item, idx) => {
+
+                        var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
+                        if (aHu.length > 0) {
+                            _aHu.forEach(x => {
+                                if (x.huId == item.HUID && x.huItem == item.HUITEM) {
+                                    x.toQty = item.TOQTY;
+                                }
+                            })
+                        } else {
+                            _aHu.push({
+                                huId: item.HUID,
+                                huItem: item.HUITEM,
+                                toQty: item.TOQTY,
+                                plant: _this.getView().getModel("ui").getData().issPlant,
+                                sloc: _this.getView().getModel("ui").getData().issSloc,
+                                matNo: _this.getView().getModel("ui").getData().issMatNo,
+                                batch: _this.getView().getModel("ui").getData().issBatch
+                            })
                         }
                     })
-                })
+
+                    // Sum for Picked Qty
+                    _this.getView().getModel("to").getData().results.forEach(item => {
+                        var aHu = _aHu.filter(x => x.plant == item.ISSPLANT && 
+                            x.sloc == item.ISSSLOC && x.matNo == item.ISSMATNO && x.batch == item.ISSBATCH);
+                        var total = 0.0;
+
+                        if (aHu.length > 0) {
+                            aHu.forEach(x => {
+                                total += x.toQty
+                            })
+                        }
+
+                        item.PICKQTY = total;
+                    })
+
+                    this.byId("btnEditHu").setVisible(true);
+                    this.byId("btnRefreshHu").setVisible(true);
+                    this.byId("btnSaveHu").setVisible(false);
+                    this.byId("btnCancelHu").setVisible(false);
+                    
+                    _this.onRefreshHu();
+                } else {
+                    MessageBox.information(_oCaption.WARN_NO_DATA_MODIFIED);
+                }
+            },
+
+            onCancelHu() {
+                var aEditedRows = this.getView().getModel("hu").getData().results.filter(item => item.Edited === true);
+
+                if (aEditedRows.length > 0) {
+                    MessageBox.confirm(_oCaption.CONFIRM_DISREGARD_CHANGE, {
+                        actions: ["Yes", "No"],
+                        onClose: function (sAction) {
+                            if (sAction == "Yes") {
+
+                                this.byId("btnEditHu").setVisible(true);
+                                this.byId("btnRefreshHu").setVisible(true);
+                                this.byId("btnSaveHu").setVisible(false);
+                                this.byId("btnCancelHu").setVisible(false);
+
+                                _this.onRefreshHu();
+                            }
+                        }
+                    });
+                } else {
+                    this.byId("btnEditHu").setVisible(true);
+                    this.byId("btnRefreshHu").setVisible(true);
+                    this.byId("btnSaveHu").setVisible(false);
+                    this.byId("btnCancelHu").setVisible(false);
+
+                    _this.onRefreshHu();
+                }
+            },
+
+            onInputLiveChange(oEvent) {},
+
+            onNumberLiveChange(oEvent) {
+                var oSource = oEvent.getSource();
+                var sRowPath = oSource.getBindingInfo("value").binding.oContext.sPath;
+                var sModel = oSource.getBindingInfo("value").parts[0].model;
+                var dValue = oEvent.getParameters().value;
+
+                _this.getView().getModel(sModel).setProperty(sRowPath + '/Edited', true);
+
+                // var aHu = _aHu.filter(x => x.huId == oData.HUID && x.huItem == oData.HUITEM);
+                // if (aHu.length > 0) {
+                //     _aHu.forEach(item => {
+                //         if (item.huId == oData.HUID && item.huItem == oData.HUITEM) {
+                //             item.toQty = dValue;
+                //         }
+                //     })
+                // } else {
+                //     _aHu.push({
+                //         huId: oData.HUID,
+                //         huItem: oData.HUITEM,
+                //         toQty: dValue
+                //     })
+                // }
             },
 
             onCellClickTo(oEvent) {
@@ -191,9 +313,13 @@ sap.ui.define([
                 oCaptionParam.push({CODE: "POSTDT"});
                 oCaptionParam.push({CODE: "MATSLIP"});
                 oCaptionParam.push({CODE: "HDRTXT"});
+                oCaptionParam.push({CODE: "POSTTO"});
+                oCaptionParam.push({CODE: "CANCELTO"});
 
                 // MessageBox
                 oCaptionParam.push({CODE: "INFO_NO_RECORD_SELECT"});
+                oCaptionParam.push({CODE: "INFO_NO_DATA_EDIT"});
+                oCaptionParam.push({CODE: "WARN_NO_DATA_MODIFIED"});
                 
                 oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",

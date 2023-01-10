@@ -31,6 +31,8 @@
                     <PropertyRef Name="RSVYEAR"/>
                     <PropertyRef Name="ITEM"/>
                 </Key>
+                <Property Name="PICKQTY" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:label="PICKQTY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="RSVKEY" Type="Edm.String" Nullable="false" MaxLength="18" sap:unicode="false" sap:label="RSVKEY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="RSVNO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Reservation" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="RSVYEAR" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ITEM" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Item no." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -46,7 +48,6 @@
                 <Property Name="REQQTY" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="UOM" sap:label="Quantity" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ISSQTY" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="UOM" sap:label="Quantity" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="BALANCE" Type="Edm.Decimal" Nullable="false" Precision="15" Scale="3" sap:unicode="false" sap:label="BALANCE" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="TOQTY" Type="Edm.Byte" Nullable="false" sap:unicode="false" sap:label="TOQTY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="UOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Base Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
             </EntityType>
             <EntityType Name="MatDoc" sap:content-version="1">
@@ -79,11 +80,16 @@
                     <PropertyRef Name="HUITEM"/>
                 </Key>
                 <Property Name="HUID" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="HUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="UOMDECIMAL" Type="Edm.Int16" Nullable="false" sap:unicode="false" sap:label="Rounding" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PLANTCD" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Plant" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="HUITEM" Type="Edm.String" Nullable="false" MaxLength="5" sap:unicode="false" sap:label="HUITEM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SLOC" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Stor. Loc." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MATNO" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Material" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="STORAGEAREA" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="STORAGEAREA" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="BATCH" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Batch" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="BIN" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Bin Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="QTY" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="UOM" sap:label="QTY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="TOQTY" Type="Edm.Byte" Nullable="false" sap:unicode="false" sap:label="TOQTY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="TOQTY" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:label="TOQTY" sap:creatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="UOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Base Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
                 <Property Name="GROSSWEIGHT" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="WEIGHTUOM" sap:label="Gross weight" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="NETWEIGHT" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="WEIGHTUOM" sap:label="Net Weight" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>

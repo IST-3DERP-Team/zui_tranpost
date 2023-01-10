@@ -14,6 +14,11 @@
         </dependents>
         <content>
             <VBox id="vbTranPost" fitContainer="true">
+                <Toolbar id="TB1" style="Clear">
+                    <ToolbarSpacer />
+                    <Button id="btnPostTo" type="Ghost" text="{caption>/POSTTO}" press="onPostTo" visible="true"/>
+                    <Button id="btnCancelTo" type="Ghost" text="{caption>/CANCELTO}" press="onCancelTo" visible="true"/> 
+                </Toolbar>
                 <f:Form id="frmHeader" editable="true" class="sapUiNoContentPadding" width="100%">
                     <f:layout>
                         <f:ResponsiveGridLayout columnsL="2" singleContainerFullSize="false" />
@@ -91,6 +96,27 @@
                     columnSelect="onColumnUpdated"
                     columnVisibility="onColumnUpdated"
                     rowSelectionChange="onRowSelectionChangeHu">
+                    <uiT:extension>
+                        <Toolbar>
+                            <ToolbarSpacer/>
+                            <Button id="btnEditHu" 
+                                icon="sap-icon://edit"
+                                press="onEditHu"
+                                visible="true"/>
+                            <Button id="btnRefreshHu" 
+                                icon="sap-icon://refresh"
+                                press="onRefreshHu" 
+                                visible="true" />
+                            <Button id="btnSaveHu" 
+                                icon="sap-icon://save"
+                                press="onSaveHu" 
+                                visible="false" />
+                            <Button id="btnCancelHu" 
+                                icon="sap-icon://sys-cancel"
+                                press="onCancelHu"
+                                visible="false" />  
+                        </Toolbar>
+                    </uiT:extension>
                     <uiT:layoutData>
                         <FlexItemData growFactor="1" baseSize="0%"/>
                     </uiT:layoutData>
