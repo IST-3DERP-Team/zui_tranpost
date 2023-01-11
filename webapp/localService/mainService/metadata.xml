@@ -98,11 +98,20 @@
                 <Property Name="WIDTH" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="WEIGHTUOM" sap:label="WIDTH" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="DIMUOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="DIMUOM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
             </EntityType>
+            <EntityType Name="Whse" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="WHSECD"/>
+                </Key>
+                <Property Name="WHSECD" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Warehouse Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="USETO" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Boolean" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="USEHU" Type="Edm.String" Nullable="false" MaxLength="2" sap:unicode="false" sap:label="USEHU" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
             <EntityContainer Name="ZGW_3DERP_TRANPOST_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="MRSet" EntityType="ZGW_3DERP_TRANPOST_SRV.MR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="TOSet" EntityType="ZGW_3DERP_TRANPOST_SRV.TO" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="MatDocSet" EntityType="ZGW_3DERP_TRANPOST_SRV.MatDoc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="HUSet" EntityType="ZGW_3DERP_TRANPOST_SRV.HU" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="WhseSet" EntityType="ZGW_3DERP_TRANPOST_SRV.Whse" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
             </EntityContainer>
             <atom:link rel="self" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZGW_3DERP_TRANPOST_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZGW_3DERP_TRANPOST_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>

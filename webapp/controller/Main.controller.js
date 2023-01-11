@@ -57,6 +57,19 @@ sap.ui.define([
                 this.byId("btnAdd").setEnabled(false);
                 this.byId("btnRefresh").setEnabled(false);
 
+                this._tableRendered = "";
+                var oTableEventDelegate = {
+                    onkeyup: function(oEvent){
+                        _this.onKeyUp(oEvent);
+                    },
+
+                    onAfterRendering: function(oEvent) {
+                        _this.onAfterTableRendering(oEvent);
+                    }
+                };
+
+                this.byId("tranPostTab").addEventDelegate(oTableEventDelegate);
+
                 _this.closeLoadingDialog();
             },
 
@@ -69,8 +82,6 @@ sap.ui.define([
                 
                 _aSmartFilter = aSmartFilter;
                 _sSmartFilterGlobal = sSmartFilterGlobal;
-
-                console.log("onsearch", aSmartFilter);
 
                 this.getTranPost(aSmartFilter, sSmartFilterGlobal);
 
@@ -149,19 +160,94 @@ sap.ui.define([
                 })
 
                 var aData = _this.getView().getModel("tranPost").getData().results;
+                var oData;
                 var sRsvList = "";
+                var aDataUnique = [];
+                var bDataUnique = true;
 
                 aOrigSelIdx.forEach(i => {
-                    var oData = aData[i];
+                    oData = aData[i];
+
+                    var aDataUniqueFilter = aDataUnique.filter(x => x.issPlant == oData.ISSPLANT && x.moveType == oData.MOVETYPE)
+                    if (aDataUniqueFilter.length == 0) {
+                        console.log(oData)
+                        aDataUnique.push({
+                            issPlant: oData.ISSPLANT,
+                            moveType: oData.MOVETYPE
+                        })
+                    }
+
+                    if (aDataUnique.length > 1) bDataUnique = false;
+
                     sRsvList += oData.RSVNO + oData.RSVYEAR + oData.ITEM + "+";
                 })
 
+                if (!bDataUnique) {
+                    MessageBox.warning(_oCaption.ISSPLANT + " and " + _oCaption.MVTTYPE + " " + _oCaption.INFO_SHOULD_BE_SAME);
+                    return;
+                }
+
                 if (sRsvList.length > 0) sRsvList = sRsvList.slice(0, -1);
 
-                this._router.navTo("RouteTo", {
-                    sbu: _this.getView().getModel("ui").getData().sbu,
-                    rsvList: sRsvList
-                });
+                var oModel = this.getOwnerComponent().getModel();
+                var oTable = _this.getView().byId("tranPostTab");
+
+                if (oData.WAREHOUSE) {
+                    var sFilter = "WHSECD eq '" + oData.WAREHOUSE + "'";
+                    oModel.read('/WhseSet', {
+                        urlParameters: {
+                            "$filter": sFilter
+                        },
+                        success: function (data, response) {
+                            console.log("WhseSet", data)
+                            if (data.results.length > 0) {
+                                if (data.results[0].USETO == "X" && (data.results[0].USEHU == "02" || data.results[0].USEHU == "03")) {
+                                    _this._router.navTo("RouteTo", {
+                                        sbu: _this.getView().getModel("ui").getData().sbu,
+                                        rsvList: sRsvList
+                                    });
+                                } else {
+                                    _this._router.navTo("RouteMatDoc", {
+                                        sbu: _this.getView().getModel("ui").getData().sbu,
+                                        rsvList: sRsvList
+                                    });
+                                }
+                            }
+                        },
+                        error: function (err) { 
+                            console.log("error", err)
+                        }
+                    })
+                } else {
+                    _this._router.navTo("RouteMatDoc", {
+                        sbu: _this.getView().getModel("ui").getData().sbu,
+                        rsvList: sRsvList
+                    });
+                }
+            },
+
+            onRefresh() {
+                this.getTranPost(_aSmartFilter, _sSmartFilterGlobal);
+            },
+
+            onKeyUp(oEvent) {
+                if ((oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") && oEvent.srcControl.sParentAggregationName === "rows") {
+                    var oTable = this.byId(oEvent.srcControl.sId).oParent;
+
+                    if (this.byId(oEvent.srcControl.sId).getBindingContext("tranPost")) {
+                        var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("tranPost").sPath;
+                        
+                        oTable.getModel("tranPost").getData().results.forEach(row => row.ACTIVE = "");
+                        oTable.getModel("tranPost").setProperty(sRowPath + "/ACTIVE", "X"); 
+                        
+                        oTable.getRows().forEach(row => {
+                            if (row.getBindingContext("tranPost") && row.getBindingContext("tranPost").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                row.addStyleClass("activeRow");
+                            }
+                            else row.removeStyleClass("activeRow")
+                        })
+                    }
+                }
             },
 
             getCaption() {
@@ -180,6 +266,7 @@ sap.ui.define([
 
                 // MessageBox
                 oCaptionParam.push({CODE: "INFO_NO_RECORD_SELECT"});
+                oCaptionParam.push({CODE: "INFO_SHOULD_BE_SAME"});
                 
                 oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",

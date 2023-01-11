@@ -41,8 +41,8 @@
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
-                        <sfb:ControlConfiguration id="filterSloc" key="SLOC" groupId="_BASIC" label="{caption>/SLOC}" controlType="dropDownList" 
-                            displayBehaviour="idOnly" mandatory="notMandatory" index="5">
+                        <sfb:ControlConfiguration id="filterSloc" key="ISSSLOC" groupId="_BASIC" label="{caption>/SLOC}" controlType="dropDownList" 
+                            displayBehaviour="idAndDescription" mandatory="notMandatory" index="5">
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:layoutData>

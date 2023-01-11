@@ -177,7 +177,7 @@
                 },
                 {
                     "name": "RouteMatDoc",
-                    "pattern": "MatDoc",
+                    "pattern": "MatDoc/{sbu},{rsvList}",
                     "greedy": false,
                     "target": [
                         "TargetMatDoc"

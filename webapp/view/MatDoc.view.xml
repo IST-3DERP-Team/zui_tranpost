@@ -1,4 +1,4 @@
-<mvc:View controllerName="zuitranpost.controller.To"
+<mvc:View controllerName="zuitranpost.controller.MatDoc"
     xmlns:mvc="sap.ui.core.mvc" 
     displayBlock="true"
     xmlns="sap.m"
@@ -13,7 +13,7 @@
         <dependents>
         </dependents>
         <content>
-            <VBox id="vbTranPost" fitContainer="true">
+            <VBox id="vbMatDoc" fitContainer="true">
                 <Toolbar id="TB1" style="Clear">
                     <ToolbarSpacer />
                     <Button id="btnPostTo" type="Ghost" text="{caption>/POSTTO}" press="onPostTo" visible="true"/>
@@ -55,16 +55,16 @@
                     </f:formContainers>
                 </f:Form>
 
-                <uiT:Table id="toTab"
+                <uiT:Table id="matDocTab"
                     class="tablePadding"
-                    rows="{to>/results}"
+                    rows="{matDoc>/results}"
                     visibleRowCountMode="Auto"
                     showColumnVisibilityMenu="true"
                     enableColumnFreeze="true"
                     enableCellFilter="true"
                     selectionMode="MultiToggle"
                     firstVisibleRowChanged="onFirstVisibleRowChanged"
-                    cellClick="onCellClickTo"
+                    cellClick="onCellClickMatDoc"
                     sort="onSorted"
                     filter="onFilter"
                     columnFreeze="onColumnUpdated"
@@ -72,51 +72,7 @@
                     columnResize="onColumnUpdated"
                     columnSelect="onColumnUpdated"
                     columnVisibility="onColumnUpdated"
-                    rowSelectionChange="onRowSelectionChangeTo">
-                    <uiT:layoutData>
-                        <FlexItemData growFactor="1" baseSize="0%"/>
-                    </uiT:layoutData>
-                </uiT:Table>
-
-                <uiT:Table id="huTab"
-                    class="tablePadding"
-                    rows="{hu>/results}"
-                    visibleRowCountMode="Auto"
-                    showColumnVisibilityMenu="true"
-                    enableColumnFreeze="true"
-                    enableCellFilter="true"
-                    selectionMode="MultiToggle"
-                    firstVisibleRowChanged="onFirstVisibleRowChanged"
-                    cellClick="onCellClick"
-                    sort="onSorted"
-                    filter="onFilter"
-                    columnFreeze="onColumnUpdated"
-                    columnMove="onColumnUpdated"
-                    columnResize="onColumnUpdated"
-                    columnSelect="onColumnUpdated"
-                    columnVisibility="onColumnUpdated"
-                    rowSelectionChange="onRowSelectionChangeHu">
-                    <uiT:extension>
-                        <Toolbar>
-                            <ToolbarSpacer/>
-                            <Button id="btnEditHu" 
-                                icon="sap-icon://edit"
-                                press="onEditHu"
-                                visible="true"/>
-                            <Button id="btnRefreshHu" 
-                                icon="sap-icon://refresh"
-                                press="onRefreshHu" 
-                                visible="true" />
-                            <Button id="btnSaveHu" 
-                                icon="sap-icon://save"
-                                press="onSaveHu" 
-                                visible="false" />
-                            <Button id="btnCancelHu" 
-                                icon="sap-icon://sys-cancel"
-                                press="onCancelHu"
-                                visible="false" />  
-                        </Toolbar>
-                    </uiT:extension>
+                    rowSelectionChange="onRowSelectionChangeMatDoc">
                     <uiT:layoutData>
                         <FlexItemData growFactor="1" baseSize="0%"/>
                     </uiT:layoutData>

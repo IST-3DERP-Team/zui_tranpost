@@ -270,9 +270,10 @@ sap.ui.define([
             var aFilterCol = [];
 
             if (pFilters.length > 0 && pFilters[0].aFilters) {
+                console.log("pFilters", pFilters)
                 pFilters[0].aFilters.forEach(x => {
                     if (Object.keys(x).includes("aFilters")) {
-                        
+                        console.log("test", 1, x)
                         x.aFilters.forEach(y => {
                             console.log("aFilters", y, this._aColumns[pModel])
                             var sName = this._aColumns[pModel].filter(item => item.name.toUpperCase() == y.sPath.toUpperCase())[0].name;
@@ -284,13 +285,12 @@ sap.ui.define([
                         aFilterGrp.push(oFilterGrp);
                         aFilter = [];
                     } else {
+                        console.log("test", 2, x, this._aColumns[pModel])
                         var sName = this._aColumns[pModel].filter(item => item.name.toUpperCase() == x.sPath.toUpperCase())[0].name;
                         aFilter.push(new Filter(sName, FilterOperator.Contains, x.oValue1));
                         var oFilterGrp = new Filter(aFilter, false);
                         aFilterGrp.push(oFilterGrp);
                         aFilter = [];
-
-                        //if (!aFilterCol.includes(sName)) aFilterCol.push(sName);
                     }
                 });
             } else {
@@ -362,7 +362,89 @@ sap.ui.define([
 
         formatDate(pDate) {
             return _sapDateFormat.format(pDate);
-        }
+        },
+
+        onAfterTableRendering: function(oEvent) {
+            if (this._tableRendered !== "") {
+                this.setActiveRowHighlight(this._tableRendered.replace("Tab", ""));
+                this._tableRendered = "";
+            } 
+        },
+
+        onFirstVisibleRowChanged: function (oEvent) {
+            var oSource = oEvent.getSource();
+            var sModel = oSource.mBindingInfos.rows.model;
+            var oTable = oEvent.getSource();
+
+            setTimeout(() => {
+                var oData = oTable.getModel(sModel).getData().results;
+                var iStartIndex = oTable.getBinding("rows").iLastStartIndex;
+                var iLength = oTable.getBinding("rows").iLastLength + iStartIndex;
+
+                if (oTable.getBinding("rows").aIndices.length > 0) {
+                    for (var i = iStartIndex; i < iLength; i++) {
+                        var iDataIndex = oTable.getBinding("rows").aIndices.filter((fItem, fIndex) => fIndex === i);
+
+                        if (oData[iDataIndex].ACTIVE === "X") oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].addStyleClass("activeRow");
+                        else oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].removeStyleClass("activeRow");
+                    }
+                }
+                else {
+                    for (var i = iStartIndex; i < iLength; i++) {
+                        if (oData[i].ACTIVE === "X") oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].addStyleClass("activeRow");
+                        else oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].removeStyleClass("activeRow");
+                    }
+                }
+            }, 1);
+        },
+
+        onFilter: function(oEvent) {
+            var oTable = oEvent.getSource();
+            var oSource = oEvent.getSource();
+            var sModel = oSource.mBindingInfos.rows.model;
+
+            this.setActiveRowHighlight(sModel);
+        },
+
+        onColumnUpdated: function (oEvent) {
+            var oSource = oEvent.getSource();
+            var sModel = oSource.mBindingInfos.rows.model;
+
+            this.setActiveRowHighlight(sModel);
+        },
+
+        setActiveRowHighlight(pModel) {
+            var oTable = this.byId(pModel + "Tab");
+            
+            setTimeout(() => {
+                var iActiveRowIndex = oTable.getModel(pModel).getData().results.findIndex(item => item.ACTIVE === "X");
+
+                oTable.getRows().forEach(row => {
+                    if (row.getBindingContext(pModel) && +row.getBindingContext(pModel).sPath.replace("/results/", "") === iActiveRowIndex) {
+                        row.addStyleClass("activeRow");
+                    }
+                    else row.removeStyleClass("activeRow");
+                })
+            }, 1);
+        },
+
+        onCellClick: function(oEvent) {
+            if (oEvent.getParameters().rowBindingContext) {
+                var oTable = oEvent.getSource();
+                var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
+                var sModel = oEvent.getSource().mBindingInfos.rows.model;
+
+                oTable.getModel(sModel).getData().results.forEach(row => row.ACTIVE = "");
+                oTable.getModel(sModel).setProperty(sRowPath + "/ACTIVE", "X"); 
+                
+                oTable.getRows().forEach(row => {
+                    if (row.getBindingContext(sModel) && row.getBindingContext(sModel).sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                        row.addStyleClass("activeRow");
+                    }
+                    else row.removeStyleClass("activeRow");
+                })
+            }
+        },
     });
    
   });

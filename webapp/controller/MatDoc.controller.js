@@ -18,7 +18,7 @@ sap.ui.define([
         var _oCaption = {};
         var _aHu = [];
 
-        return BaseController.extend("zuitranpost.controller.To", {
+        return BaseController.extend("zuitranpost.controller.MatDoc", {
             onInit: function () {
                 _this = this;
 
@@ -26,24 +26,17 @@ sap.ui.define([
 
                 var aTableList = [];
                 aTableList.push({
-                    modCode: "TRANPOSTTOMOD",
-                    tblSrc: "ZDV_TRANSPOST_TO",
-                    tblId: "toTab",
-                    tblModel: "to"
-                });
-
-                aTableList.push({
-                    modCode: "TRANPOSTHUMOD",
-                    tblSrc: "ZDV_TRANSPOST_HU",
-                    tblId: "huTab",
-                    tblModel: "hu"
+                    modCode: "TRANPOSTMDMOD",
+                    tblSrc: "ZDV_TRANSPOST_MD",
+                    tblId: "matDocTab",
+                    tblModel: "matDoc"
                 });
 
                 _this.getColumns(aTableList);
                 
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
-                this._router.getRoute("RouteTo").attachPatternMatched(this._routePatternMatched, this);
+                this._router.getRoute("RouteMatDoc").attachPatternMatched(this._routePatternMatched, this);
             },
 
             _routePatternMatched: function (oEvent) {
@@ -60,7 +53,7 @@ sap.ui.define([
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
 
                 _this.showLoadingDialog("Loading...");
-                _this.getTo();
+                //_this.getTo();
 
                 var sCurrentDate = _this.formatDate(new Date());
                 _this.byId("dpDocDt").setValue(sCurrentDate);
@@ -80,8 +73,7 @@ sap.ui.define([
                     }
                 };
 
-                this.byId("toTab").addEventDelegate(oTableEventDelegate);
-                this.byId("huTab").addEventDelegate(oTableEventDelegate);
+                this.byId("matDocTab").addEventDelegate(oTableEventDelegate);
 
                 _this.closeLoadingDialog();
             },
