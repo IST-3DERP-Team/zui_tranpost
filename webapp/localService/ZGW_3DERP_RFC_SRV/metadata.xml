@@ -280,8 +280,8 @@
                 <Property Name="CutoffDate" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Qty" Type="Edm.Decimal" Nullable="false" Precision="15" Scale="3" sap:unicode="false" sap:unit="Uom" sap:label="Scale quantity" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Uom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Base Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
-                <NavigationProperty Name="N_GetValidInfoRecParam" Relationship="ZGW_3DERP_RFC_SRV.A_GetValidInfoRecParam" FromRole="FromRole_A_GetValidInfoRecParam" ToRole="ToRole_A_GetValidInfoRecParam"/>
                 <NavigationProperty Name="N_GetValidInfoRecReturn" Relationship="ZGW_3DERP_RFC_SRV.A_GetValidInfoRecReturn" FromRole="FromRole_A_GetValidInfoRecReturn" ToRole="ToRole_A_GetValidInfoRecReturn"/>
+                <NavigationProperty Name="N_GetValidInfoRecParam" Relationship="ZGW_3DERP_RFC_SRV.A_GetValidInfoRecParam" FromRole="FromRole_A_GetValidInfoRecParam" ToRole="ToRole_A_GetValidInfoRecParam"/>
             </EntityType>
             <EntityType Name="GetValidInfoRecordReturn" sap:content-version="1">
                 <Key>
@@ -833,8 +833,8 @@
                 <Property Name="CustomerGroup" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Country" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Forwhatdate" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="OKbetr" Type="Edm.Decimal" Nullable="false" Precision="12" Scale="3" sap:unicode="false" sap:label="Amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <NavigationProperty Name="N_GetDiscRateReturn" Relationship="ZGW_3DERP_RFC_SRV.A_GetDiscRateReturn" FromRole="FromRole_A_GetDiscRateReturn" ToRole="ToRole_A_GetDiscRateReturn"/>
                 <NavigationProperty Name="N_GetDiscRateParam" Relationship="ZGW_3DERP_RFC_SRV.A_GetDiscRateParam" FromRole="FromRole_A_GetDiscRateParam" ToRole="ToRole_A_GetDiscRateParam"/>
+                <NavigationProperty Name="N_GetDiscRateReturn" Relationship="ZGW_3DERP_RFC_SRV.A_GetDiscRateReturn" FromRole="FromRole_A_GetDiscRateReturn" ToRole="ToRole_A_GetDiscRateReturn"/>
             </EntityType>
             <EntityType Name="GetDiscRateReturn" sap:content-version="1">
                 <Key>
@@ -987,8 +987,8 @@
                 </Key>
                 <Property Name="MRPTYP" Type="Edm.String" Nullable="false" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="SBU" Type="Edm.String" Nullable="false" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <NavigationProperty Name="N_CreateMRPDataParam" Relationship="ZGW_3DERP_RFC_SRV.A_CreateMRPDataParam" FromRole="FromRole_A_CreateMRPDataParam" ToRole="ToRole_A_CreateMRPDataParam"/>
                 <NavigationProperty Name="N_CreateMRPDataReturn" Relationship="ZGW_3DERP_RFC_SRV.A_CreateMRPDataReturn" FromRole="FromRole_A_CreateMRPDataReturn" ToRole="ToRole_A_CreateMRPDataReturn"/>
+                <NavigationProperty Name="N_CreateMRPDataParam" Relationship="ZGW_3DERP_RFC_SRV.A_CreateMRPDataParam" FromRole="FromRole_A_CreateMRPDataParam" ToRole="ToRole_A_CreateMRPDataParam"/>
             </EntityType>
             <EntityType Name="ExtendMaterial" sap:content-version="1">
                 <Key>
@@ -1619,6 +1619,62 @@
                 <Property Name="iv_userid" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <NavigationProperty Name="N_POST903_RETURN" Relationship="ZGW_3DERP_RFC_SRV.A_Post903_Return" FromRole="FromRole_A_Post903_Return" ToRole="ToRole_A_Post903_Return"/>
             </EntityType>
+            <EntityType Name="GoodsMvt_ToDtl" sap:label="ToDtl" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Rsvno"/>
+                    <PropertyRef Name="Rsvyr"/>
+                    <PropertyRef Name="Rspos"/>
+                </Key>
+                <Property Name="Rsvno" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Reservation" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rsvyr" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rspos" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Item no." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Issmatno" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="ISSMATNO" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Issplant" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="ISSPLANT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Isssloc" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="ISSSLOC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Issbatch" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="ISSBATCH" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Movetype" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="MOVETYPE" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Entryqty" Type="Edm.Decimal" Precision="18" Scale="5" sap:unicode="false" sap:unit="Entryuom" sap:label="Quantity" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Entryuom" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="ENTRYUOM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Unloadpt" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="UNLOADPT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rcvmatno" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="RCVMATNO" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rcvplant" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="RCVPLANT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rcvsloc" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="RCVSLOC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rcvbatch" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="RCVBATCH" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="GoodsMvt_ToItems" sap:label="ToItems" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Rsvno"/>
+                    <PropertyRef Name="Rsvyr"/>
+                    <PropertyRef Name="Rspos"/>
+                </Key>
+                <Property Name="Rsvno" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Reservation" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rsvyr" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Fiscal Year" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Rspos" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Item no." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Inthuid" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="INTHUID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Huitem" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="HUITEM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Toqty" Type="Edm.Decimal" Precision="18" Scale="5" sap:unicode="false" sap:unit="Baseuom" sap:label="Quantity" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Baseuom" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="BASEUOM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+            </EntityType>
+            <EntityType Name="GoodsMvt_ToHdr" sap:label="ToHdr" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Docdt"/>
+                </Key>
+                <Property Name="Docdt" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="DOCDT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Postdt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="POSTDT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Matslip" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="MATSLIP" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Hdrtxt" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="HDRTXT" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Username" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="User" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="GoodsMvt_Post_TP" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="MsgTyp"/>
+                </Key>
+                <Property Name="MsgTyp" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Message" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <NavigationProperty Name="N_GOODSMVT_TPRET" Relationship="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPRet" FromRole="FromRole_A_GoodsMvt_TPRet" ToRole="ToRole_A_GoodsMvt_TPRet"/>
+                <NavigationProperty Name="N_GOODSMVT_TPHDR" Relationship="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPHdr" FromRole="FromRole_A_GoodsMvt_TPHdr" ToRole="ToRole_A_GoodsMvt_TPHdr"/>
+                <NavigationProperty Name="N_GOODSMVT_TPDTL" Relationship="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPDtl" FromRole="FromRole_A_GoodsMvt_TPDtl" ToRole="ToRole_A_GoodsMvt_TPDtl"/>
+                <NavigationProperty Name="N_GOODSMVT_TPITEMS" Relationship="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPItems" FromRole="FromRole_A_GoodsMvt_TPItems" ToRole="ToRole_A_GoodsMvt_TPItems"/>
+            </EntityType>
             <ComplexType Name="ZfmErpGetnumbr">
                 <Property Name="EReturnNo" Type="Edm.String" Nullable="false" MaxLength="40" sap:label="Material" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </ComplexType>
@@ -1813,6 +1869,22 @@
                         <PropertyRef Name="PurGroup"/>
                     </Dependent>
                 </ReferentialConstraint>
+            </Association>
+            <Association Name="A_GoodsMvt_TPHdr" sap:content-version="1">
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_Post_TP" Multiplicity="*" Role="FromRole_A_GoodsMvt_TPHdr"/>
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_ToHdr" Multiplicity="*" Role="ToRole_A_GoodsMvt_TPHdr"/>
+            </Association>
+            <Association Name="A_GoodsMvt_TPDtl" sap:content-version="1">
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_Post_TP" Multiplicity="*" Role="FromRole_A_GoodsMvt_TPDtl"/>
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_ToDtl" Multiplicity="*" Role="ToRole_A_GoodsMvt_TPDtl"/>
+            </Association>
+            <Association Name="A_GoodsMvt_TPItems" sap:content-version="1">
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_Post_TP" Multiplicity="*" Role="FromRole_A_GoodsMvt_TPItems"/>
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_ToItems" Multiplicity="*" Role="ToRole_A_GoodsMvt_TPItems"/>
+            </Association>
+            <Association Name="A_GoodsMvt_TPRet" sap:content-version="1">
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_Post_TP" Multiplicity="*" Role="FromRole_A_GoodsMvt_TPRet"/>
+                <End Type="ZGW_3DERP_RFC_SRV.GoodsMvt_Return" Multiplicity="*" Role="ToRole_A_GoodsMvt_TPRet"/>
             </Association>
             <Association Name="A_CreateMRPDataParam" sap:content-version="1">
                 <End Type="ZGW_3DERP_RFC_SRV.CreateMRPData" Multiplicity="*" Role="FromRole_A_CreateMRPDataParam"/>
@@ -2257,6 +2329,10 @@
                 <EntitySet Name="IT_DataSet" EntityType="ZGW_3DERP_RFC_SRV.IT_Data" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <EntitySet Name="GoodsMvt_CancelSet" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_Cancel" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <EntitySet Name="GoodsMvt_Post903Set" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_Post903" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="GoodsMvt_ToDtlSet" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_ToDtl" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GoodsMvt_ToItemsSet" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_ToItems" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GoodsMvt_ToHdrSet" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_ToHdr" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GoodsMvt_Post_TPSet" EntityType="ZGW_3DERP_RFC_SRV.GoodsMvt_Post_TP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <AssociationSet Name="A_EPrtabSet" Association="ZGW_3DERP_RFC_SRV.A_EPrtab" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="EMrtabSet" Role="FromRole_A_EPrtab"/>
                     <End EntitySet="EPrtabSet" Role="ToRole_A_EPrtab"/>
@@ -2300,6 +2376,10 @@
                 <AssociationSet Name="A_GoodsMvt_Item" Association="ZGW_3DERP_RFC_SRV.A_GoodsMvt_Item" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="GoodsMvt_CreateSet" Role="FromRole_A_GoodsMvt_Item"/>
                     <End EntitySet="GoodsMvt_ItemSet" Role="ToRole_A_GoodsMvt_Item"/>
+                </AssociationSet>
+                <AssociationSet Name="A_GoodsMvt_TPRet_AssocSet" Association="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPRet" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GoodsMvt_Post_TPSet" Role="FromRole_A_GoodsMvt_TPRet"/>
+                    <End EntitySet="GoodsMvt_ReturnSet" Role="ToRole_A_GoodsMvt_TPRet"/>
                 </AssociationSet>
                 <AssociationSet Name="A_GetInfoRecMatParamSet" Association="ZGW_3DERP_RFC_SRV.A_GetInfoRecMatParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="GetInfoRecordSet" Role="FromRole_A_GetInfoRecMatParam"/>
@@ -2356,6 +2436,10 @@
                 <AssociationSet Name="A_CreateMRPDataReturnSet" Association="ZGW_3DERP_RFC_SRV.A_CreateMRPDataReturn" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="CreateMRPDataSet" Role="FromRole_A_CreateMRPDataReturn"/>
                     <End EntitySet="CreateMRPDataReturnSet" Role="ToRole_A_CreateMRPDataReturn"/>
+                </AssociationSet>
+                <AssociationSet Name="A_GoodsMvt_TPDtl" Association="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPDtl" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GoodsMvt_Post_TPSet" Role="FromRole_A_GoodsMvt_TPDtl"/>
+                    <End EntitySet="GoodsMvt_ToDtlSet" Role="ToRole_A_GoodsMvt_TPDtl"/>
                 </AssociationSet>
                 <AssociationSet Name="A_PORel_ImptabSet" Association="ZGW_3DERP_RFC_SRV.A_PORel_Imptab" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="PO_ReleaseSet" Role="FromRole_A_PORel_Imptab"/>
@@ -2501,6 +2585,10 @@
                     <End EntitySet="Get_PO_Change_VendorSet" Role="FromRole_A_CT_UASCOND"/>
                     <End EntitySet="CT_UASCondSet" Role="ToRole_A_CT_UASCOND"/>
                 </AssociationSet>
+                <AssociationSet Name="A_GoodsMvt_TPItems" Association="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPItems" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GoodsMvt_Post_TPSet" Role="FromRole_A_GoodsMvt_TPItems"/>
+                    <End EntitySet="GoodsMvt_ToItemsSet" Role="ToRole_A_GoodsMvt_TPItems"/>
+                </AssociationSet>
                 <AssociationSet Name="A_GetNumberParamSet" Association="ZGW_3DERP_RFC_SRV.A_GetNumberParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="GetNumberSet" Role="FromRole_A_GetNumberParam"/>
                     <End EntitySet="GetNumberParamSet" Role="ToRole_A_GetNumberParam"/>
@@ -2516,6 +2604,10 @@
                 <AssociationSet Name="A_IPrtab_AssocSet" Association="ZGW_3DERP_RFC_SRV.A_IPrtab" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="EMrtabSet" Role="FromRole_A_IPrtab"/>
                     <End EntitySet="EPrtabSet" Role="ToRole_A_IPrtab"/>
+                </AssociationSet>
+                <AssociationSet Name="A_GoodsMvt_TPHdr" Association="ZGW_3DERP_RFC_SRV.A_GoodsMvt_TPHdr" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GoodsMvt_Post_TPSet" Role="FromRole_A_GoodsMvt_TPHdr"/>
+                    <End EntitySet="GoodsMvt_ToHdrSet" Role="ToRole_A_GoodsMvt_TPHdr"/>
                 </AssociationSet>
                 <AssociationSet Name="A_CreateMRItemsSet" Association="ZGW_3DERP_RFC_SRV.A_CreateMRItems" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="CreateMRSet" Role="FromRole_A_CreateMRItems"/>

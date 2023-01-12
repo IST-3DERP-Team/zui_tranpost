@@ -64,7 +64,7 @@
                     enableCellFilter="true"
                     selectionMode="MultiToggle"
                     firstVisibleRowChanged="onFirstVisibleRowChanged"
-                    cellClick="onCellClickMatDoc"
+                    cellClick="onCellClick"
                     sort="onSorted"
                     filter="onFilter"
                     columnFreeze="onColumnUpdated"
@@ -72,7 +72,28 @@
                     columnResize="onColumnUpdated"
                     columnSelect="onColumnUpdated"
                     columnVisibility="onColumnUpdated"
-                    rowSelectionChange="onRowSelectionChangeMatDoc">
+                    rowSelectionChange="onRowSelectionChange">
+                    <uiT:extension>
+                        <Toolbar>
+                            <ToolbarSpacer/>
+                            <Button id="btnEdit" 
+                                icon="sap-icon://edit"
+                                press="onEdit"
+                                visible="true"/>
+                            <Button id="btnRefresh" 
+                                icon="sap-icon://refresh"
+                                press="onRefresh" 
+                                visible="true" />
+                            <Button id="btnSave" 
+                                icon="sap-icon://save"
+                                press="onSave" 
+                                visible="false" />
+                            <Button id="btnCancel" 
+                                icon="sap-icon://sys-cancel"
+                                press="onCancel"
+                                visible="false" />  
+                        </Toolbar>
+                    </uiT:extension>
                     <uiT:layoutData>
                         <FlexItemData growFactor="1" baseSize="0%"/>
                     </uiT:layoutData>

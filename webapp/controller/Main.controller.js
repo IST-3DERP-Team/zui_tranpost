@@ -34,7 +34,6 @@ sap.ui.define([
                     sbu: "VER" // temporary Sbu
                 }), "ui");
 
-                _this._aColumns = {};
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
 
                 _this.showLoadingDialog("Loading...");
@@ -146,11 +145,14 @@ sap.ui.define([
             },
 
             onAdd() {
+                _this.showLoadingDialog("Loading...");
+
                 var oTable = this.byId("tranPostTab");
                 var aSelIdx = oTable.getSelectedIndices();
 
                 if (aSelIdx.length === 0) {
                     MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
+                    _this.closeLoadingDialog();
                     return;
                 }
 
@@ -164,6 +166,7 @@ sap.ui.define([
                 var sRsvList = "";
                 var aDataUnique = [];
                 var bDataUnique = true;
+                var aRsvLockList = [];
 
                 aOrigSelIdx.forEach(i => {
                     oData = aData[i];
@@ -179,21 +182,58 @@ sap.ui.define([
 
                     if (aDataUnique.length > 1) bDataUnique = false;
 
+                    // Lock Reservation
+                    aRsvLockList.push({
+                        Rsvno: oData.RSVNO,
+                        Rsvyr: oData.RSVYEAR,
+                        Rspos: oData.ITEM
+                    })
+
                     sRsvList += oData.RSVNO + oData.RSVYEAR + oData.ITEM + "+";
                 })
 
+                if (sRsvList.length > 0) sRsvList = sRsvList.slice(0, -1);
+
                 if (!bDataUnique) {
                     MessageBox.warning(_oCaption.ISSPLANT + " and " + _oCaption.MVTTYPE + " " + _oCaption.INFO_SHOULD_BE_SAME);
+                    _this.closeLoadingDialog();
                     return;
                 }
 
-                if (sRsvList.length > 0) sRsvList = sRsvList.slice(0, -1);
+                var oModelLock = this.getOwnerComponent().getModel("ZGW_3DERP_LOCK_SRV");
+                var oParamLock = {
+                    N_LOCK_MRTAB: aRsvLockList,
+                    iv_count: 300,
+                    N_LOCK_MRENQ: [],
+                    N_LOCK_MRRETURN: []
+                }
 
-                var oModel = this.getOwnerComponent().getModel();
-                var oTable = _this.getView().byId("tranPostTab");
+                oModelLock.create("/Lock_MRSet", oParamLock, {
+                    method: "POST",
+                    success: function(data, oResponse) {
+                        console.log("Lock_MRSet", data);
 
-                if (oData.WAREHOUSE) {
-                    var sFilter = "WHSECD eq '" + oData.WAREHOUSE + "'";
+                        if (data.N_LOCK_MRRETURN.results.filter(x => x.Type != "S").length == 0) {
+                            _this.onRoute(sRsvList, oData.WAREHOUSE);
+                        } else {
+                            var oFilter = data.N_LOCK_MRRETURN.results.filter(x => x.Type != "S")[0];
+                            MessageBox.warning(oFilter.Message);
+                            _this.closeLoadingDialog();
+                        }
+                        
+                    },
+                    error: function(err) {
+                        MessageBox.error(err);
+                        _this.closeLoadingDialog();
+                    }
+                });
+            },
+
+            onRoute(pRsvList, pWarehouse) {
+                var oModel = _this.getOwnerComponent().getModel();
+
+                if (pWarehouse) {
+                    var sFilter = "WHSECD eq '" + pWarehouse + "'";
                     oModel.read('/WhseSet', {
                         urlParameters: {
                             "$filter": sFilter
@@ -201,27 +241,32 @@ sap.ui.define([
                         success: function (data, response) {
                             console.log("WhseSet", data)
                             if (data.results.length > 0) {
+                                _this.closeLoadingDialog();
+                                
                                 if (data.results[0].USETO == "X" && (data.results[0].USEHU == "02" || data.results[0].USEHU == "03")) {
                                     _this._router.navTo("RouteTo", {
                                         sbu: _this.getView().getModel("ui").getData().sbu,
-                                        rsvList: sRsvList
+                                        rsvList: pRsvList
                                     });
                                 } else {
                                     _this._router.navTo("RouteMatDoc", {
                                         sbu: _this.getView().getModel("ui").getData().sbu,
-                                        rsvList: sRsvList
+                                        rsvList: pRsvList
                                     });
                                 }
                             }
                         },
                         error: function (err) { 
                             console.log("error", err)
+                            _this.closeLoadingDialog();
                         }
                     })
                 } else {
+                    _this.closeLoadingDialog();
+
                     _this._router.navTo("RouteMatDoc", {
                         sbu: _this.getView().getModel("ui").getData().sbu,
-                        rsvList: sRsvList
+                        rsvList: pRsvList
                     });
                 }
             },

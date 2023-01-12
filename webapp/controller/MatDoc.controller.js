@@ -49,12 +49,14 @@ sap.ui.define([
             },
 
             initializeComponent() {
-                _this._aColumns = {};
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
 
                 _this.showLoadingDialog("Loading...");
-                //_this.getTo();
 
+                setTimeout(() => {
+                    _this.getMatDoc();
+                }, 500);
+            
                 var sCurrentDate = _this.formatDate(new Date());
                 _this.byId("dpDocDt").setValue(sCurrentDate);
                 _this.byId("dpPostDt").setValue(sCurrentDate);
@@ -78,17 +80,17 @@ sap.ui.define([
                 _this.closeLoadingDialog();
             },
 
-            getTo() {
+            getMatDoc() {
                 _this.showLoadingDialog("Loading...");
 
-                var oTable = _this.getView().byId("toTab");
+                var oTable = _this.getView().byId("matDocTab");
                 var oModel = _this.getOwnerComponent().getModel();
                 var aRsvList = _this.getView().getModel("ui").getData().rsvList.toString().split("+");
                 var aRsvData = [];
 
                 aRsvList.forEach((item, idx) => {
                     var sFilter = "RSVKEY eq '" + item + "'";
-                    oModel.read('/TOSet', {
+                    oModel.read('/MatDocSet', {
                         urlParameters: {
                             "$filter": sFilter
                         },
@@ -96,7 +98,7 @@ sap.ui.define([
                             aRsvData.push(data.results[0]);
 
                             if (idx == (aRsvList.length -1)) {
-                                console.log("TOSet", aRsvData)
+                                console.log("MatDoc", aRsvData)
 
                                 var aFilterTab = [];
                                 if (oTable.getBinding("rows")) {
@@ -108,11 +110,11 @@ sap.ui.define([
                                     results: aRsvData
                                 });
 
-                                _this.getView().setModel(oJSONModel, "to");
-                                _this._tableRendered = "toTab";
-                                _this.onFilterByCol("to", aFilterTab);
+                                _this.getView().setModel(oJSONModel, "matDoc");
+                                _this._tableRendered = "matDocTab";
+                                _this.onFilterByCol("matDoc", aFilterTab);
 
-                                _this.setRowReadMode("to");
+                                _this.setRowReadMode("matDoc");
 
                                 oTable.getColumns().forEach((col, idx) => {   
                                     if (col._oSorter) {
@@ -131,122 +133,221 @@ sap.ui.define([
                 })
             },
 
-            getHu() {
-                var oModel = _this.getOwnerComponent().getModel();
-                var sPlant = _this.getView().getModel("ui").getData().issPlant;
-                var sSloc = _this.getView().getModel("ui").getData().issSloc;
-                var sMatNo = _this.getView().getModel("ui").getData().issMatNo;
-                var sIssBatch = _this.getView().getModel("ui").getData().issBatch;
+            onPostTo() {
+                _this.showLoadingDialog("Loading...");
 
-                var sFilter = "PLANTCD eq '" + sPlant + "' and SLOC eq '" + sSloc + "' and MATNO eq '" + sMatNo + 
-                                "' and BATCH eq '" + sIssBatch + "'";
-                oModel.read('/HUSet', {
-                    urlParameters: {
-                        "$filter": sFilter
-                    },
-                    success: function (data, response) {
-                        console.log("HUSet", data)
+                var oTable = this.byId("matDocTab");
+                var aSelIdx = oTable.getSelectedIndices();
+                var bProceed = true;
 
-                        if (data.results.length > 0) {
-                            data.results.forEach(item => {
-                                var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
-                                if (aHu.length > 0) {
-                                    item.TOQTY = aHu[0].toQty;
-                                }
-                            })
-                        }
+                if (aSelIdx.length === 0) {
+                    MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
+                    _this.closeLoadingDialog();
+                    return;
+                }
 
-                        var oJSONModel = new JSONModel();
-                        oJSONModel.setData(data);
-                        _this.getView().setModel(oJSONModel, "hu");
-                        _this._tableRendered = "huTab";
-                        _this.setRowReadMode("hu");
-                    },
-                    error: function (err) { 
-                        console.log("error", err)
+                var aOrigSelIdx = [];
+                aSelIdx.forEach(i => {
+                    aOrigSelIdx.push(oTable.getBinding("rows").aIndices[i]);
+                })
+
+                var aData = _this.getView().getModel("matDoc").getData().results;
+                var oData;
+
+                aOrigSelIdx.forEach(i => {
+                    oData = aData[i];
+                    if (parseFloat(oData.TOQTY) == 0.0) {
+                        bProceed = false;
+                        MessageBox.warning(_oCaption.INFO_TOQTY_GREATER_THAN_ZERO);
                         _this.closeLoadingDialog();
                     }
-                })
+                });
+                
+                if (!bProceed) return;
+
+                MessageBox.confirm(_oCaption.INFO_PROCEED_POST, {
+                    actions: ["Yes", "No"],
+                    onClose: function (sAction) {
+                        if (sAction == "Yes") {
+                            var oParam = {
+                                MsgTyp: "",
+                                N_GOODSMVT_TPHDR: [],
+                                N_GOODSMVT_TPDTL: [],
+                                N_GOODSMVT_TPITEMS: [],
+                                N_GOODSMVT_TPRET: []
+                            };
+
+                            oParam.N_GOODSMVT_TPHDR.push({
+                                Docdt: _this.formatDate(new Date(_this.byId("dpDocDt").getValue())) + "T00:00:00",
+                                Postdt: _this.formatDate(new Date(_this.byId("dpPostDt").getValue())) + "T00:00:00",
+                                Matslip: _this.byId("iptMatSlip").getValue(),
+                                Hdrtxt: _this.byId("iptHdrTxt").getValue(),
+                                Username: _startUpInfo.id
+                            });
+
+                            aOrigSelIdx.forEach(i => {
+                                oData = aData[i];
+
+                                oParam.N_GOODSMVT_TPDTL.push({
+                                    "Rsvno": oData.RSVNO, 
+                                    "Rsvyr": oData.RSVYEAR, 
+                                    "Rspos": oData.ITEM, 
+                                    "Issmatno": oData.ISSMATNO, 
+                                    "Issplant": oData.ISSPLANT, 
+                                    "Isssloc": oData.ISSSLOC, 
+                                    "Issbatch": oData.ISSBATCH, 
+                                    "Movetype": oData.MOVETYPE, 
+                                    "Entryqty": oData.TOQTY, 
+                                    "Entryuom": oData.UOM, 
+                                    "Rcvmatno": oData.RCVMATNO, 
+                                    "Rcvplant": oData.RCVPLANT, 
+                                    "Rcvsloc": oData.RCVSLOC, 
+                                    "Rcvbatch": oData.RCVBATCH
+                                })
+
+                                oParam.N_GOODSMVT_TPITEMS.push({
+                                    "Rsvno": oData.RSVNO,
+                                    "Rsvyr": oData.RSVYEAR,
+                                    "Rspos":  oData.ITEM, 
+                                    "Toqty": oData.TOQTY, 
+                                    "Baseuom": oData.UOM, 
+                                })
+                            });
+
+                            console.log("GoodsMvt_Post_TPSet param", oParam)
+                            var oModelRFC = _this.getOwnerComponent().getModel("ZGW_3DERP_RFC_SRV");
+                            oModelRFC.create("/GoodsMvt_Post_TPSet", oParam, {
+                                method: "POST",
+                                success: function(oResult, oResponse) {
+                                    console.log("GoodsMvt_Post_TPSet", oResult, oResponse);
+            
+                                    if (oResult.MsgTyp == "S") {
+                                        _this.unlockRsv();
+                                    } else {
+                                        var sMessage = oResult.N_GOODSMVT_TPRET.results[0].Message;
+                                        MessageBox.error(sMessage);
+                                    }
+                                },
+                                error: function(err) {
+                                    sap.m.MessageBox.error(_oCaption.INFO_EXECUTE_FAIL);
+                                    _this.closeLoadingDialog();
+                                }
+                            });
+                            
+                        }
+                    }
+                });
             },
 
-            onEditHu() {
-                var aRows = this.getView().getModel("hu").getData().results;
+            onCancelTo() {
+                MessageBox.confirm(_oCaption.CONFIRM_PROCEED_CLOSE, {
+                    actions: ["Yes", "No"],
+                    onClose: function (sAction) {
+                        if (sAction == "Yes") {
+                            _this.unlockRsv();
+                        }
+                    }
+                });
+            },
+
+            unlockRsv() {
+                var aRsvLockList = [];
+                _this.getView().getModel("matDoc").getData().results.forEach(item => {
+                    aRsvLockList.push({
+                        Rsvno: item.RSVNO,
+                        Rsvyr: item.RSVYEAR,
+                        Rspos: item.ITEM
+                    })
+                })
+
+                var oModelLock = _this.getOwnerComponent().getModel("ZGW_3DERP_LOCK_SRV");
+                var oParamLock = {
+                    N_UNLOCK_MRTAB: aRsvLockList,
+                    N_UNLOCK_MRENQ: [],
+                    N_UNLOCK_MRRETURN: []
+                }
+
+                oModelLock.create("/Unlock_MRSet", oParamLock, {
+                    method: "POST",
+                    success: function(data, oResponse) {
+                        console.log("Unlock_MRSet", data);
+                        _this.closeLoadingDialog();
+
+                        if (data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S").length == 0) {
+                            _this._router.navTo("RouteMain", {}, true);
+                        } else {
+                            var oFilter = data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S")[0];
+                            MessageBox.warning(oFilter.Message);
+                        }
+                        
+                    },
+                    error: function(err) {
+                        MessageBox.error(err);
+                        _this.closeLoadingDialog();
+                    }
+                });
+            },
+
+            onEdit() {
+                var aRows = this.getView().getModel("matDoc").getData().results;
                 
                 if (aRows.length > 0) {
-                    this.byId("btnEditHu").setVisible(false);
-                    this.byId("btnRefreshHu").setVisible(false);
-                    this.byId("btnSaveHu").setVisible(true);
-                    this.byId("btnCancelHu").setVisible(true);
+                    this.byId("btnEdit").setVisible(false);
+                    this.byId("btnRefresh").setVisible(false);
+                    this.byId("btnSave").setVisible(true);
+                    this.byId("btnCancel").setVisible(true);
 
-                    this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("hu").getData());
-                    this.setRowEditMode("hu");
+                    this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("matDoc").getData());
+                    this.setRowEditMode("matDoc");
                 } else {
                     MessageBox.warning(_oCaption.INFO_NO_DATA_EDIT);
                 }
             },
 
-            onRefreshHu() {
-                _this.getHu();
+            onRefresh() {
+                _this.getMatDoc();
             },
 
-            onSaveHu() {
-                var oTable = this.byId("huTab");
-                var aEditedRows = this.getView().getModel("hu").getData().results.filter(item => item.Edited === true);
+            onSave() {
+                var oTable = this.byId("matDocTab");
+                var aEditedRows = this.getView().getModel("matDoc").getData().results.filter(item => item.Edited === true);
 
                 if (aEditedRows.length > 0) {
-                    aEditedRows.forEach((item, idx) => {
+                    // aEditedRows.forEach((item, idx) => {
 
-                        var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
-                        if (aHu.length > 0) {
-                            _aHu.forEach(x => {
-                                if (x.huId == item.HUID && x.huItem == item.HUITEM) {
-                                    x.toQty = item.TOQTY;
-                                }
-                            })
-                        } else {
-                            _aHu.push({
-                                huId: item.HUID,
-                                huItem: item.HUITEM,
-                                toQty: item.TOQTY,
-                                plant: _this.getView().getModel("ui").getData().issPlant,
-                                sloc: _this.getView().getModel("ui").getData().issSloc,
-                                matNo: _this.getView().getModel("ui").getData().issMatNo,
-                                batch: _this.getView().getModel("ui").getData().issBatch
-                            })
-                        }
-                    })
+                    //     var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
+                    //     if (aHu.length > 0) {
+                    //         _aHu.forEach(x => {
+                    //             if (x.huId == item.HUID && x.huItem == item.HUITEM) {
+                    //                 x.toQty = item.TOQTY;
+                    //             }
+                    //         })
+                    //     } else {
+                    //         _aHu.push({
+                    //             huId: item.HUID,
+                    //             huItem: item.HUITEM,
+                    //             toQty: item.TOQTY,
+                    //             plant: _this.getView().getModel("ui").getData().issPlant,
+                    //             sloc: _this.getView().getModel("ui").getData().issSloc,
+                    //             matNo: _this.getView().getModel("ui").getData().issMatNo,
+                    //             batch: _this.getView().getModel("ui").getData().issBatch
+                    //         })
+                    //     }
+                    // })
 
-                    // Sum for Picked Qty
-                    _this.getView().getModel("to").getData().results.forEach((item, idx) => {
-                        
-                        var aHu = _aHu.filter(x => x.plant == item.ISSPLANT && 
-                            x.sloc == item.ISSSLOC && x.matNo == item.ISSMATNO && x.batch == item.ISSBATCH);
-
-                        var total = 0.0;
-
-                        if (aHu.length > 0) {
-                            aHu.forEach(x => {
-                                total += parseFloat(x.toQty)
-                            })
-                        }
-
-                        var sRowPath = "/results/" + idx.toString();
-                        _this.getView().getModel("to").setProperty(sRowPath + "/PICKQTY", total.toString());
-                    })
-
-                    this.byId("btnEditHu").setVisible(true);
-                    this.byId("btnRefreshHu").setVisible(true);
-                    this.byId("btnSaveHu").setVisible(false);
-                    this.byId("btnCancelHu").setVisible(false);
+                    this.byId("btnEdit").setVisible(true);
+                    this.byId("btnRefresh").setVisible(true);
+                    this.byId("btnSave").setVisible(false);
+                    this.byId("btnCancel").setVisible(false);
                     
-                    _this.onRefreshHu();
+                    _this.setRowReadMode("matDoc");
                 } else {
                     MessageBox.information(_oCaption.WARN_NO_DATA_MODIFIED);
                 }
             },
 
-            onCancelHu() {
-                var aEditedRows = this.getView().getModel("hu").getData().results.filter(item => item.Edited === true);
+            onCancel() {
+                var aEditedRows = this.getView().getModel("matDoc").getData().results.filter(item => item.Edited === true);
 
                 if (aEditedRows.length > 0) {
                     MessageBox.confirm(_oCaption.CONFIRM_DISREGARD_CHANGE, {
@@ -254,22 +355,22 @@ sap.ui.define([
                         onClose: function (sAction) {
                             if (sAction == "Yes") {
 
-                                this.byId("btnEditHu").setVisible(true);
-                                this.byId("btnRefreshHu").setVisible(true);
-                                this.byId("btnSaveHu").setVisible(false);
-                                this.byId("btnCancelHu").setVisible(false);
+                                this.byId("btnEdit").setVisible(true);
+                                this.byId("btnRefresh").setVisible(true);
+                                this.byId("btnSave").setVisible(false);
+                                this.byId("btnCancel").setVisible(false);
 
-                                _this.onRefreshHu();
+                                _this.getView().getModel("matDoc").setProperty("/", _this._oDataBeforeChange);
                             }
                         }
                     });
                 } else {
-                    this.byId("btnEditHu").setVisible(true);
-                    this.byId("btnRefreshHu").setVisible(true);
-                    this.byId("btnSaveHu").setVisible(false);
-                    this.byId("btnCancelHu").setVisible(false);
+                    this.byId("btnEdit").setVisible(true);
+                    this.byId("btnRefresh").setVisible(true);
+                    this.byId("btnSave").setVisible(false);
+                    this.byId("btnCancel").setVisible(false);
 
-                    _this.onRefreshHu();
+                    _this.getView().getModel("matDoc").setProperty("/", _this._oDataBeforeChange);
                 }
             },
 
@@ -284,64 +385,22 @@ sap.ui.define([
                 _this.getView().getModel(sModel).setProperty(sRowPath + '/Edited', true);
             },
 
-            onCellClickTo(oEvent) {
-                var sIssPlant = oEvent.getParameters().rowBindingContext.getObject().ISSPLANT;
-                var sIssSloc = oEvent.getParameters().rowBindingContext.getObject().ISSSLOC;
-                var sIssMatNo = oEvent.getParameters().rowBindingContext.getObject().ISSMATNO;
-                var sIssBatch = oEvent.getParameters().rowBindingContext.getObject().ISSBATCH;
-
-                this.getView().getModel("ui").setProperty("/issPlant", sIssPlant);
-                this.getView().getModel("ui").setProperty("/issSloc", sIssSloc);
-                this.getView().getModel("ui").setProperty("/issMatNo", sIssMatNo);
-                this.getView().getModel("ui").setProperty("/issBatch", sIssBatch);
-
-                this.getHu();
-                this.onCellClick(oEvent);
-                this.clearSortFilter("huTab");
-            },
-
             onKeyUp(oEvent) {
                 if ((oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") && oEvent.srcControl.sParentAggregationName === "rows") {
                     var oTable = this.byId(oEvent.srcControl.sId).oParent;
 
-                    if (oTable.getId().indexOf("toTab") >= 0) { 
-                        var sRowPath = this.byId(oEvent.srcControl.sId).oBindingContexts["to"].sPath;
-                        var oRow = this.getView().getModel("to").getProperty(sRowPath);
-
-                        this.getView().getModel("ui").setProperty("/issPlant", oRow.ISSPLANT);
-                        this.getView().getModel("ui").setProperty("/issSloc", oRow.ISSSLOC);
-                        this.getView().getModel("ui").setProperty("/issMatNo", oRow.ISSMATNO);
-                        this.getView().getModel("ui").setProperty("/issBatch", oRow.ISSBATCH);
-
-                        this.getHu();
-
-                        if (this.byId(oEvent.srcControl.sId).getBindingContext("to")) {
-                            var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("to").sPath;
-                            
-                            oTable.getModel("to").getData().results.forEach(row => row.ACTIVE = "");
-                            oTable.getModel("to").setProperty(sRowPath + "/ACTIVE", "X"); 
-                            
-                            oTable.getRows().forEach(row => {
-                                if (row.getBindingContext("to") && row.getBindingContext("to").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
-                                    row.addStyleClass("activeRow");
-                                }
-                                else row.removeStyleClass("activeRow")
-                            })
-                        }
-                    } else {
-                        if (this.byId(oEvent.srcControl.sId).getBindingContext("hu")) {
-                            var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("hu").sPath;
-                            
-                            oTable.getModel("hu").getData().results.forEach(row => row.ACTIVE = "");
-                            oTable.getModel("hu").setProperty(sRowPath + "/ACTIVE", "X"); 
-                            
-                            oTable.getRows().forEach(row => {
-                                if (row.getBindingContext("hu") && row.getBindingContext("hu").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
-                                    row.addStyleClass("activeRow");
-                                }
-                                else row.removeStyleClass("activeRow")
-                            })
-                        }
+                    if (this.byId(oEvent.srcControl.sId).getBindingContext("matDoc")) {
+                        var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("matDoc").sPath;
+                        
+                        oTable.getModel("matDoc").getData().results.forEach(row => row.ACTIVE = "");
+                        oTable.getModel("matDoc").setProperty(sRowPath + "/ACTIVE", "X"); 
+                        
+                        oTable.getRows().forEach(row => {
+                            if (row.getBindingContext("matDoc") && row.getBindingContext("matDoc").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                row.addStyleClass("activeRow");
+                            }
+                            else row.removeStyleClass("activeRow")
+                        })
                     }
                 }
             },
@@ -364,6 +423,9 @@ sap.ui.define([
                 oCaptionParam.push({CODE: "INFO_NO_RECORD_SELECT"});
                 oCaptionParam.push({CODE: "INFO_NO_DATA_EDIT"});
                 oCaptionParam.push({CODE: "WARN_NO_DATA_MODIFIED"});
+                oCaptionParam.push({CODE: "CONFIRM_PROCEED_CLOSE"});
+                oCaptionParam.push({CODE: "INFO_PROCEED_POST"});
+                oCaptionParam.push({CODE: "INFO_TOQTY_GREATER_THAN_ZERO"});
                 
                 oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",

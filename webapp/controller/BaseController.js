@@ -28,6 +28,8 @@ sap.ui.define([
         onInitBase(pThis, pSbu) {
             _this = pThis;
             _sSbu = pSbu;
+
+            this._aColumns = {};
         },
    
         getColumns: async function(pTableList) {
@@ -69,7 +71,8 @@ sap.ui.define([
                     oJSONColumnsModel.setData(oData);
 
                     if (oData.results.length > 0) {
-                        var aColumns = _this.setTableColumns(oColumns[tblModel], oData.results);                          
+                        var aColumns = _this.setTableColumns(oColumns[tblModel], oData.results);   
+                        console.log("_aColumns");
                         _this._aColumns[tblModel] = aColumns["columns"];
                         _this.addColumns(_this.byId(tblId), aColumns["columns"], tblModel);
                     }
@@ -174,7 +177,7 @@ sap.ui.define([
 
         setRowReadMode(pModel) {
             var oTable = this.byId(pModel + "Tab");
-            oTable.getColumns().forEach((col, idx) => {                    
+            oTable.getColumns().forEach((col, idx) => {     
                 this._aColumns[pModel].filter(item => item.label === col.getLabel().getText())
                     .forEach(ci => {
                         if (ci.type === "STRING" || ci.type === "NUMBER") {
@@ -196,7 +199,6 @@ sap.ui.define([
         },
 
         setRowEditMode(pModel) {
-            console.log("setRowEditMode", pModel, this._aColumns[pModel])
             this.getView().getModel(pModel).getData().results.forEach(item => item.Edited = false);
 
             var oTable = this.byId(pModel + "Tab");
