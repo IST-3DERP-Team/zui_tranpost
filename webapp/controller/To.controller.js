@@ -129,7 +129,15 @@ sap.ui.define([
                                 _this._tableRendered = "toTab";
                                 _this.onFilterByCol("to", aFilterTab);
 
-                                console.log("setRowReadMode")
+                                _this.getView().getModel("ui").setProperty("/rsvNo", aRsvData[0].RSVNO);
+                                _this.getView().getModel("ui").setProperty("/rsvYear", aRsvData[0].RSVYEAR);
+                                _this.getView().getModel("ui").setProperty("/item", aRsvData[0].ITEM);
+                                _this.getView().getModel("ui").setProperty("/issPlant", aRsvData[0].ISSPLANT);
+                                _this.getView().getModel("ui").setProperty("/issSloc", aRsvData[0].ISSSLOC);
+                                _this.getView().getModel("ui").setProperty("/issMatNo", aRsvData[0].ISSMATNO);
+                                _this.getView().getModel("ui").setProperty("/issBatch", aRsvData[0].ISSBATCH);
+
+                                _this.getHu();
                                 _this.setRowReadMode("to");
 
                                 oTable.getColumns().forEach((col, idx) => {   
@@ -215,6 +223,7 @@ sap.ui.define([
                                     "Movetype": oData.MOVETYPE, 
                                     "Entryqty": oData.PICKQTY, 
                                     "Entryuom": oData.UOM, 
+                                    "Unloadpt": oData.RSVNO + oData.ITEM,
                                     "Rcvmatno": oData.RCVMATNO, 
                                     "Rcvplant": oData.RCVPLANT, 
                                     "Rcvsloc": oData.RCVSLOC, 
@@ -293,12 +302,13 @@ sap.ui.define([
                         console.log("Unlock_MRSet", data);
                         _this.closeLoadingDialog();
 
-                        if (data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S").length == 0) {
-                            _this._router.navTo("RouteMain", {}, true);
-                        } else {
-                            var oFilter = data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S")[0];
-                            MessageBox.warning(oFilter.Message);
-                        }
+                        _this._router.navTo("RouteMain", {}, true);
+                        // if (data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S").length == 0) {
+                        //     _this._router.navTo("RouteMain", {}, true);
+                        // } else {
+                        //     var oFilter = data.N_UNLOCK_MRRETURN.results.filter(x => x.Type != "S")[0];
+                        //     MessageBox.warning(oFilter.Message);
+                        // }
                         
                     },
                     error: function(err) {
@@ -329,6 +339,8 @@ sap.ui.define([
                                 var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
                                 if (aHu.length > 0) {
                                     item.TOQTY = aHu[0].toQty;
+                                } else {
+                                    item.TOQTY = null;
                                 }
                             })
                         }
@@ -371,6 +383,33 @@ sap.ui.define([
                 var aEditedRows = this.getView().getModel("hu").getData().results.filter(item => item.Edited === true);
 
                 if (aEditedRows.length > 0) {
+                    // Validation UOM
+                    var bErr = false;
+                    var sUom = "";
+                    var iUomDecimal = 0;
+
+                    aEditedRows.forEach((item, idx) => {
+                        var aNum = parseFloat(item.TOQTY).toString().split(".");
+
+                        if (item.UOMDECIMAL == 0) {
+                            if (!Number.isInteger(parseFloat(item.TOQTY))) bErr = true;
+                        } else if (item.UOMDECIMAL > 0) {
+                            if (aNum.length == 1) bErr = true;
+                            else if (aNum[1].length != item.UOMDECIMAL) bErr = true;
+                        }
+
+                        if (bErr) {
+                            sUom = item.UOM;
+                            iUomDecimal = item.UOMDECIMAL;
+                        }
+                    });
+
+                    if (bErr) {
+                        var sErrMsg = "UOM " + sUom + " should only have " + iUomDecimal.toString() + " decimal place(s).";
+                        MessageBox.warning(sErrMsg);
+                        return;
+                    }
+
                     aEditedRows.forEach((item, idx) => {
 
                         var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);

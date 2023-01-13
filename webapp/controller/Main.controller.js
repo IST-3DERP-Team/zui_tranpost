@@ -39,6 +39,10 @@ sap.ui.define([
                 _this.showLoadingDialog("Loading...");
                 _this.getCaption();
 
+                _this.getIssPlant();
+                _this.getWarehouse("");
+                _this.getSloc("");
+
                 var aTableList = [];
                 aTableList.push({
                     modCode: "TRANPOSTMOD",
@@ -70,6 +74,65 @@ sap.ui.define([
                 this.byId("tranPostTab").addEventDelegate(oTableEventDelegate);
 
                 _this.closeLoadingDialog();
+            },
+
+            getIssPlant() {
+                var oModel = this.getOwnerComponent().getModel("ZVB_3DERP_TRANPOST_FILTER_CDS");
+                oModel.read('/ZVB_3DERP_TRANPOST_ISSPLANT_SH', {
+                    success: function (data, response) {
+                        //console.log("IssPlant", data);
+                        var oJSONModel = new JSONModel();
+                        oJSONModel.setData(data);
+                        _this.getView().setModel(oJSONModel, "issPlant");
+                    },
+                    error: function (err) { 
+                        console.log("error", err)
+                    }
+                })
+            },
+
+            onSelectionChangeIssPlant(oEvent) {
+                var sSelectedKey = this.getView().byId("cmbIssPlant").getSelectedKey();
+                _this.getWarehouse(sSelectedKey);
+                _this.getSloc(sSelectedKey);
+            },
+
+            getWarehouse(pFilter) {
+                var oModel = this.getOwnerComponent().getModel("ZVB_3DERP_TRANPOST_FILTER_CDS");
+                oModel.read('/ZVB_3DERP_TRANPOST_WHSE_SH', {
+                    success: function (data, response) {
+                        //console.log("Warehouse", data);
+                        var aData = [];
+                        if (pFilter) aData = { results: data.results.filter(x => x.DESCRIPTION == pFilter) };
+                        else aData = data;
+
+                        var oJSONModel = new JSONModel();
+                        oJSONModel.setData(aData);
+                        _this.getView().setModel(oJSONModel, "warehouse");
+                    },
+                    error: function (err) { 
+                        console.log("error", err)
+                    }
+                })
+            },
+
+            getSloc(pFilter) {
+                var oModel = this.getOwnerComponent().getModel("ZVB_3DERP_TRANPOST_FILTER_CDS");
+                oModel.read('/ZVB_3DERP_TRANPOST_SLOC_SH', {
+                    success: function (data, response) {
+                        //console.log("Sloc", data);
+                        var aData = [];
+                        if (pFilter) aData = { results: data.results.filter(x => x.PLANTCD == pFilter) };
+                        else aData = data;
+
+                        var oJSONModel = new JSONModel();
+                        oJSONModel.setData(aData);
+                        _this.getView().setModel(oJSONModel, "sloc");
+                    },
+                    error: function (err) { 
+                        console.log("error", err)
+                    }
+                })
             },
 
             onSearch(oEvent) {

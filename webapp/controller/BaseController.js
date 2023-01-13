@@ -120,8 +120,8 @@ sap.ui.define([
                     showable: vShowable,
                     key: prop.Key === '' ? false : true,
                     maxLength: prop.Length,
-                    precision: prop.Decimal,
-                    scale: prop.Scale !== undefined ? prop.Scale : null
+                    precision: prop.Length,
+                    scale: prop.Decimal //prop.Scale !== undefined ? prop.Scale : null
                 })
             })
 
@@ -234,6 +234,7 @@ sap.ui.define([
                                 }));
                             }
                             else if (ci.type === "NUMBER") {
+                                console.log("setrowedit number", ci)
                                 col.setTemplate(new sap.m.Input({
                                     type: sap.m.InputType.Number,
                                     textAlign: sap.ui.core.TextAlign.Right,

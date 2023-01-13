@@ -22,12 +22,31 @@
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterMoveType" key="MOVETYPE" groupId="_BASIC" label="{caption>/MVTTYPE}" controlType="dropDownList" 
-                            displayBehaviour="idAndDescription" mandatory="notMandatory" index="1">
+                            displayBehaviour="idAndDescription" mandatory="mandatory" index="1">
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
-                    <sfb:controlConfiguration>
+                    <!-- <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterIssPlant" key="ISSPLANT" groupId="_BASIC" label="{caption>/ISSPLANT}" controlType="dropDownList" 
-                            displayBehaviour="idOnly" mandatory="notMandatory" index="2">
+                            displayBehaviour="idOnly" mandatory="mandatory" index="2">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration> -->
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterIssPlant" key="ISSPLANT" groupId="_BASIC" label="{caption>/ISSPLANT}" 
+                            mandatory="mandatory" index="2">
+                            <sfb:customControl>
+                                <ComboBox
+                                    id="cmbIssPlant"
+                                    showSecondaryValues= "false"
+                                    width="15rem"
+                                    items="{
+                                        path: 'issPlant>/results',
+                                        sorter: { path: 'ISSPLANT' }
+                                    }"
+                                    selectionChange="onSelectionChangeIssPlant"
+                                    >
+                                    <core:ListItem id="liIssPlant" key="{issPlant>ISSPLANT}" text="{issPlant>ISSPLANT}"/>
+                                </ComboBox>
+                            </sfb:customControl>
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:controlConfiguration>
@@ -35,14 +54,52 @@
                             displayBehaviour="idOnly" mandatory="notMandatory" index="3">
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
-                    <sfb:controlConfiguration>
+                    <!-- <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterWarehouse" key="WAREHOUSE" groupId="_BASIC" label="{caption>/WAREHOUSE}" controlType="dropDownList" 
-                            displayBehaviour="idOnly" mandatory="notMandatory" index="5">
+                            displayBehaviour="idAndDescription" mandatory="notMandatory" index="4">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration> -->
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterWarehouse" key="WAREHOUSE" groupId="_BASIC" label="{caption>/WAREHOUSE}" 
+                            mandatory="notMandatory" index="4">
+                            <sfb:customControl>
+                                <ComboBox
+                                    id="cmbWarehouse"
+                                    showSecondaryValues= "false"
+                                    width="15rem"
+                                    items="{
+                                        path: 'warehouse>/results',
+                                        sorter: { path: 'WAREHOUSE' }
+                                    }"
+                                    selectionChange="onSelectionChangeWarehouse"
+                                    >
+                                    <core:ListItem id="liWarehouse" key="{warehouse>WAREHOUSE}" text="{warehouse>WAREHOUSE} ({warehouse>DESCRIPTION})"/>
+                                </ComboBox>
+                            </sfb:customControl>
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
-                    <sfb:controlConfiguration>
+                    <!-- <sfb:controlConfiguration>
                         <sfb:ControlConfiguration id="filterSloc" key="ISSSLOC" groupId="_BASIC" label="{caption>/SLOC}" controlType="dropDownList" 
                             displayBehaviour="idAndDescription" mandatory="notMandatory" index="5">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration> -->
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration id="filterSloc" key="ISSSLOC" groupId="_BASIC" label="{caption>/SLOC}" 
+                            mandatory="notMandatory" index="5">
+                            <sfb:customControl>
+                                <ComboBox
+                                    id="cmbSloc"
+                                    showSecondaryValues= "false"
+                                    width="15rem"
+                                    items="{
+                                        path: 'sloc>/results',
+                                        sorter: { path: 'SLOC' }
+                                    }"
+                                    selectionChange="onSelectionChangeSloc"
+                                    >
+                                    <core:ListItem id="liSloc" key="{sloc>SLOC}" text="{sloc>SLOC} ({sloc>DESCRIPTION})({sloc>PLANTCD})"/>
+                                </ComboBox>
+                            </sfb:customControl>
                         </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:layoutData>
