@@ -23,6 +23,8 @@ sap.ui.define([
             onInit: function () {
                 _this = this;
 
+                _this.getCaption();
+
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
 
@@ -35,9 +37,8 @@ sap.ui.define([
                 }), "ui");
 
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
-
                 _this.showLoadingDialog("Loading...");
-                _this.getCaption();
+                
 
                 _this.getIssPlant();
                 _this.getWarehouse("");
@@ -133,6 +134,10 @@ sap.ui.define([
                         console.log("error", err)
                     }
                 })
+            },
+
+            onAfterTableRender(pTableId) {
+                //console.log("onAfterTableRendering", pTableId)
             },
 
             onSearch(oEvent) {

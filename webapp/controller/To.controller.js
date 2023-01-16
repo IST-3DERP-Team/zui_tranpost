@@ -25,23 +25,6 @@ sap.ui.define([
 
                 _this.getCaption();
                 
-                var aTableList = [];
-                aTableList.push({
-                    modCode: "TRANPOSTTOMOD",
-                    tblSrc: "ZDV_TRANSPOST_TO",
-                    tblId: "toTab",
-                    tblModel: "to"
-                });
-
-                aTableList.push({
-                    modCode: "TRANPOSTHUMOD",
-                    tblSrc: "ZDV_TRANSPOST_HU",
-                    tblId: "huTab",
-                    tblModel: "hu"
-                });
-
-                _this.getColumns(aTableList);
-                
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
                 this._router.getRoute("RouteTo").attachPatternMatched(this._routePatternMatched, this);
@@ -58,18 +41,29 @@ sap.ui.define([
 
             initializeComponent() {
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
-
                 _this.showLoadingDialog("Loading...");
+                
+                var aTableList = [];
+                aTableList.push({
+                    modCode: "TRANPOSTTOMOD",
+                    tblSrc: "ZDV_TRANSPOST_TO",
+                    tblId: "toTab",
+                    tblModel: "to"
+                });
+
+                aTableList.push({
+                    modCode: "TRANPOSTHUMOD",
+                    tblSrc: "ZDV_TRANSPOST_HU",
+                    tblId: "huTab",
+                    tblModel: "hu"
+                });
+
+                _this.getColumns(aTableList);
 
                 var oModelStartUp= new JSONModel();
                 oModelStartUp.loadData("/sap/bc/ui2/start_up").then(() => {
                     _startUpInfo = oModelStartUp.oData
                 });
-
-                setTimeout(() => {
-                    _this.getTo();
-                    _this.closeLoadingDialog();
-                }, 500);
 
                 var sCurrentDate = _this.formatDate(new Date());
                 _this.byId("dpDocDt").setValue(sCurrentDate);
@@ -93,6 +87,13 @@ sap.ui.define([
                 this.byId("huTab").addEventDelegate(oTableEventDelegate);
 
                 _this.closeLoadingDialog();
+            },
+
+            onAfterTableRender(pTableId) {
+                //console.log("onAfterTableRendering", pTableId)
+                if (pTableId == "toTab") {
+                    _this.getTo();
+                }
             },
 
             getTo() {

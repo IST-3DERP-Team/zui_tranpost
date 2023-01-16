@@ -23,16 +23,6 @@ sap.ui.define([
                 _this = this;
 
                 _this.getCaption();
-
-                var aTableList = [];
-                aTableList.push({
-                    modCode: "TRANPOSTMDMOD",
-                    tblSrc: "ZDV_TRANSPOST_MD",
-                    tblId: "matDocTab",
-                    tblModel: "matDoc"
-                });
-
-                _this.getColumns(aTableList);
                 
                 var oComponent = this.getOwnerComponent();
                 this._router = oComponent.getRouter();
@@ -50,12 +40,17 @@ sap.ui.define([
 
             initializeComponent() {
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
-
                 _this.showLoadingDialog("Loading...");
 
-                setTimeout(() => {
-                    _this.getMatDoc();
-                }, 500);
+                var aTableList = [];
+                aTableList.push({
+                    modCode: "TRANPOSTMDMOD",
+                    tblSrc: "ZDV_TRANSPOST_MD",
+                    tblId: "matDocTab",
+                    tblModel: "matDoc"
+                });
+
+                _this.getColumns(aTableList);
             
                 var sCurrentDate = _this.formatDate(new Date());
                 _this.byId("dpDocDt").setValue(sCurrentDate);
@@ -78,6 +73,13 @@ sap.ui.define([
                 this.byId("matDocTab").addEventDelegate(oTableEventDelegate);
 
                 _this.closeLoadingDialog();
+            },
+
+            onAfterTableRender(pTableId) {
+                //console.log("onAfterTableRendering", pTableId)
+                if (pTableId == "matDocTab") {
+                    _this.getMatDoc();
+                }
             },
 
             getMatDoc() {

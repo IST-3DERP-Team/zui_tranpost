@@ -72,9 +72,11 @@ sap.ui.define([
 
                     if (oData.results.length > 0) {
                         var aColumns = _this.setTableColumns(oColumns[tblModel], oData.results);   
-                        console.log("_aColumns");
                         _this._aColumns[tblModel] = aColumns["columns"];
-                        _this.addColumns(_this.byId(tblId), aColumns["columns"], tblModel);
+                        if (_this.byId(tblId).getColumns().length == 0) {
+                            _this.addColumns(_this.byId(tblId), aColumns["columns"], tblModel);
+                            _this.onAfterTableRender(tblId);
+                        }
                     }
                 },
                 error: function (err) {
@@ -276,7 +278,6 @@ sap.ui.define([
                 console.log("pFilters", pFilters)
                 pFilters[0].aFilters.forEach(x => {
                     if (Object.keys(x).includes("aFilters")) {
-                        console.log("test", 1, x)
                         x.aFilters.forEach(y => {
                             console.log("aFilters", y, this._aColumns[pModel])
                             var sName = this._aColumns[pModel].filter(item => item.name.toUpperCase() == y.sPath.toUpperCase())[0].name;
@@ -288,7 +289,6 @@ sap.ui.define([
                         aFilterGrp.push(oFilterGrp);
                         aFilter = [];
                     } else {
-                        console.log("test", 2, x, this._aColumns[pModel])
                         var sName = this._aColumns[pModel].filter(item => item.name.toUpperCase() == x.sPath.toUpperCase())[0].name;
                         aFilter.push(new Filter(sName, FilterOperator.Contains, x.oValue1));
                         var oFilterGrp = new Filter(aFilter, false);
