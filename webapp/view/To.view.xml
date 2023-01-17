@@ -11,6 +11,10 @@
     height="100%">
     <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
         <dependents>
+            <core:CommandExecution id="CE_EDIT" command="Edit" enabled="true" execute="onEditHu" />
+            <core:CommandExecution id="CE_SAVE" command="Save" enabled="true" execute="onSaveHu" />
+            <core:CommandExecution id="CE_CANCEL" command="Cancel" enabled="true" execute="onCancelHu" />
+            <core:CommandExecution id="CE_REFRESH" command="Refresh" enabled="true" execute="onRefreshHu" />
         </dependents>
         <content>
             <VBox id="vbTranPost" fitContainer="true">

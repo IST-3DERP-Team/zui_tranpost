@@ -43,6 +43,8 @@ sap.ui.define([
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
                 _this.showLoadingDialog("Loading...");
                 
+                _aHu = [];
+
                 var aTableList = [];
                 aTableList.push({
                     modCode: "TRANPOSTTOMOD",
@@ -90,7 +92,7 @@ sap.ui.define([
             },
 
             onAfterTableRender(pTableId) {
-                //console.log("onAfterTableRendering", pTableId)
+                console.log("onAfterTableRendering", pTableId)
                 if (pTableId == "toTab") {
                     _this.getTo();
                 }
@@ -116,15 +118,21 @@ sap.ui.define([
                             if (idx == (aRsvList.length -1)) {
                                 console.log("TOSet", aRsvData)
 
+                                var aData = { results: aRsvData };
+                                if (aData.results.length > 0) {
+                                    aData.results.forEach((itemData, idxData) => {
+                                        if (idxData == 0) itemData.ACTIVE = "X";
+                                        else itemData.ACTIVE = "";
+                                    })
+                                }
+
                                 var aFilterTab = [];
                                 if (oTable.getBinding("rows")) {
                                     aFilterTab = oTable.getBinding("rows").aFilters;
                                 }
 
                                 var oJSONModel = new JSONModel();
-                                oJSONModel.setData({
-                                    results: aRsvData
-                                });
+                                oJSONModel.setData(aData);
 
                                 _this.getView().setModel(oJSONModel, "to");
                                 _this._tableRendered = "toTab";
@@ -163,7 +171,7 @@ sap.ui.define([
 
                 var oTable = this.byId("toTab");
                 var aSelIdx = oTable.getSelectedIndices();
-                var bProceed = true;
+                var sErrMsg = "";
 
                 if (aSelIdx.length === 0) {
                     MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
@@ -181,14 +189,21 @@ sap.ui.define([
 
                 aOrigSelIdx.forEach(i => {
                     oData = aData[i];
-                    if (parseFloat(oData.PICKQTY) == 0.0) {
-                        bProceed = false;
-                        MessageBox.warning(_oCaption.INFO_PICKQTY_GREATER_THAN_ZERO);
-                        _this.closeLoadingDialog();
+                    var sKey = oData.RSVNO + "-" + oData.RSVYEAR + "-" + oData.ITEM;
+
+                    if (oData.RQQTYRESTRICT == "X" && oData.PICKQTY != oData.BALANCE) {
+                        sErrMsg += sErrMsg += sKey + " = " + _oCaption.INFO_PICKQTY_EQ_BALANCE + "\n";
+                    } else if (parseFloat(oData.PICKQTY) == 0.0) {
+                        sErrMsg += sKey + " = " + _oCaption.INFO_PICKQTY_GREATER_THAN_ZERO + "\n";                        
                     }
                 });
                 
-                if (!bProceed) return;
+                if (sErrMsg.length > 0) {
+                    sErrMsg = _oCaption.INFO_POST_FAIL + ":\n" + sErrMsg;
+                    MessageBox.warning(sErrMsg);
+                    _this.closeLoadingDialog();
+                    return;
+                }
 
                 MessageBox.confirm(_oCaption.INFO_PROCEED_POST, {
                     actions: ["Yes", "No"],
@@ -252,10 +267,19 @@ sap.ui.define([
                                     console.log("GoodsMvt_Post_TPSet", oResult, oResponse);
             
                                     if (oResult.MsgTyp == "S") {
-                                        _this.unlockRsv();
+                                        var sMessage = oResult.N_GOODSMVT_TPRET.results[0].Message;
+                                        MessageBox.information(sMessage, {
+                                            actions: ["Ok"],
+                                            onClose: function (sAction) {
+                                                if (sAction == "Ok") {
+                                                    _this.unlockRsv();
+                                                }
+                                            }
+                                        });
                                     } else {
                                         var sMessage = oResult.N_GOODSMVT_TPRET.results[0].Message;
                                         MessageBox.error(sMessage);
+                                        _this.closeLoadingDialog();
                                     }
                                 },
                                 error: function(err) {
@@ -336,13 +360,16 @@ sap.ui.define([
                         console.log("HUSet", data)
 
                         if (data.results.length > 0) {
-                            data.results.forEach(item => {
+                            data.results.forEach((item, idx) => {
                                 var aHu = _aHu.filter(x => x.huId == item.HUID && x.huItem == item.HUITEM);
                                 if (aHu.length > 0) {
                                     item.TOQTY = aHu[0].toQty;
                                 } else {
                                     item.TOQTY = null;
                                 }
+
+                                if (idx == 0) item.ACTIVE = "X";
+                                else item.ACTIVE = "";
                             })
                         }
 
@@ -597,6 +624,8 @@ sap.ui.define([
                 oCaptionParam.push({CODE: "CONFIRM_PROCEED_CLOSE"});
                 oCaptionParam.push({CODE: "INFO_PROCEED_POST"});
                 oCaptionParam.push({CODE: "INFO_PICKQTY_GREATER_THAN_ZERO"});
+                oCaptionParam.push({CODE: "INFO_POST_FAIL"});
+                oCaptionParam.push({CODE: "INFO_PICKQTY_EQ_BALANCE"});
                 
                 oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",

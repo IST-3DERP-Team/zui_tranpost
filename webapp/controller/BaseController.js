@@ -75,8 +75,9 @@ sap.ui.define([
                         _this._aColumns[tblModel] = aColumns["columns"];
                         if (_this.byId(tblId).getColumns().length == 0) {
                             _this.addColumns(_this.byId(tblId), aColumns["columns"], tblModel);
-                            _this.onAfterTableRender(tblId);
                         }
+
+                        _this.onAfterTableRender(tblId);
                     }
                 },
                 error: function (err) {
@@ -236,7 +237,6 @@ sap.ui.define([
                                 }));
                             }
                             else if (ci.type === "NUMBER") {
-                                console.log("setrowedit number", ci)
                                 col.setTemplate(new sap.m.Input({
                                     type: sap.m.InputType.Number,
                                     textAlign: sap.ui.core.TextAlign.Right,

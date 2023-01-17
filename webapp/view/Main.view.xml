@@ -10,6 +10,8 @@
     height="100%">
     <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
         <dependents>
+            <core:CommandExecution id="CE_NEW" command="New" enabled="true" execute="onAdd" />
+            <core:CommandExecution id="CE_REFRESH" command="Refresh" enabled="true" execute="onRefresh" />
         </dependents>
         <content>
             <VBox id="vbTranPost" fitContainer="true">

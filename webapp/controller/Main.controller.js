@@ -167,9 +167,12 @@ sap.ui.define([
                         console.log("MRSet", data)
                         if (data.results.length > 0) {
 
-                            data.results.forEach(item => {
+                            data.results.forEach((item, idx) => {
                                 if (item.CREATEDDT !== null)
                                     item.CREATEDDT = _this.formatDate(item.CREATEDDT);
+
+                                if (idx == 0) item.ACTIVE = "X";
+                                else item.ACTIVE = "";
                             })
 
                             var aFilterTab = [];

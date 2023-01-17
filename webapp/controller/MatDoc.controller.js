@@ -17,6 +17,7 @@ sap.ui.define([
         var _this;
         var _oCaption = {};
         var _aHu = [];
+        var _startUpInfo;
 
         return BaseController.extend("zuitranpost.controller.MatDoc", {
             onInit: function () {
@@ -42,6 +43,8 @@ sap.ui.define([
                 this.onInitBase(_this, _this.getView().getModel("ui").getData().sbu);
                 _this.showLoadingDialog("Loading...");
 
+                _aHu = [];
+
                 var aTableList = [];
                 aTableList.push({
                     modCode: "TRANPOSTMDMOD",
@@ -51,6 +54,11 @@ sap.ui.define([
                 });
 
                 _this.getColumns(aTableList);
+
+                var oModelStartUp= new JSONModel();
+                oModelStartUp.loadData("/sap/bc/ui2/start_up").then(() => {
+                    _startUpInfo = oModelStartUp.oData
+                });
             
                 var sCurrentDate = _this.formatDate(new Date());
                 _this.byId("dpDocDt").setValue(sCurrentDate);
@@ -106,15 +114,21 @@ sap.ui.define([
                                     item.TOQTY = null;
                                 })
 
+                                var aData = { results: aRsvData };
+                                if (aData.results.length > 0) {
+                                    aData.results.forEach((itemData, idxData) => {
+                                        if (idxData == 0) itemData.ACTIVE = "X";
+                                        else itemData.ACTIVE = "";
+                                    })
+                                }
+
                                 var aFilterTab = [];
                                 if (oTable.getBinding("rows")) {
                                     aFilterTab = oTable.getBinding("rows").aFilters;
                                 }
 
                                 var oJSONModel = new JSONModel();
-                                oJSONModel.setData({
-                                    results: aRsvData
-                                });
+                                oJSONModel.setData(aData);
 
                                 _this.getView().setModel(oJSONModel, "matDoc");
                                 _this._tableRendered = "matDocTab";
@@ -144,7 +158,7 @@ sap.ui.define([
 
                 var oTable = this.byId("matDocTab");
                 var aSelIdx = oTable.getSelectedIndices();
-                var bProceed = true;
+                var sErrMsg = "";
 
                 if (aSelIdx.length === 0) {
                     MessageBox.information(_oCaption.INFO_NO_RECORD_SELECT);
@@ -162,14 +176,21 @@ sap.ui.define([
 
                 aOrigSelIdx.forEach(i => {
                     oData = aData[i];
-                    if (parseFloat(oData.TOQTY) == 0.0) {
-                        bProceed = false;
-                        MessageBox.warning(_oCaption.INFO_TOQTY_GREATER_THAN_ZERO);
-                        _this.closeLoadingDialog();
+                    var sKey = oData.RSVNO + "-" + oData.RSVYEAR + "-" + oData.ITEM;
+
+                    if (oData.RQQTYRESTRICT == "X" && oData.TOQTY != oData.BALANCE) {
+                        sErrMsg += sErrMsg += sKey + " = " + _oCaption.INFO_TOQTY_EQ_BALANCE + "\n";
+                    } else if (parseFloat(oData.TOQTY) == 0.0) {
+                        sErrMsg += sKey + " = " + _oCaption.INFO_TOQTY_GREATER_THAN_ZERO + "\n";                        
                     }
                 });
                 
-                if (!bProceed) return;
+                if (sErrMsg.length > 0) {
+                    sErrMsg = _oCaption.INFO_POST_FAIL + ":\n" + sErrMsg;
+                    MessageBox.warning(sErrMsg);
+                    _this.closeLoadingDialog();
+                    return;
+                }
 
                 MessageBox.confirm(_oCaption.INFO_PROCEED_POST, {
                     actions: ["Yes", "No"],
@@ -229,10 +250,19 @@ sap.ui.define([
                                     console.log("GoodsMvt_Post_TPSet", oResult, oResponse);
             
                                     if (oResult.MsgTyp == "S") {
-                                        _this.unlockRsv();
+                                        var sMessage = oResult.N_GOODSMVT_TPRET.results[0].Message;
+                                        MessageBox.confirm(sMessage, {
+                                            actions: ["Ok"],
+                                            onClose: function (sAction) {
+                                                if (sAction == "Ok") {
+                                                    _this.unlockRsv();
+                                                }
+                                            }
+                                        });
                                     } else {
                                         var sMessage = oResult.N_GOODSMVT_TPRET.results[0].Message;
                                         MessageBox.error(sMessage);
+                                        _this.closeLoadingDialog();
                                     }
                                 },
                                 error: function(err) {
@@ -439,6 +469,8 @@ sap.ui.define([
                 oCaptionParam.push({CODE: "CONFIRM_PROCEED_CLOSE"});
                 oCaptionParam.push({CODE: "INFO_PROCEED_POST"});
                 oCaptionParam.push({CODE: "INFO_TOQTY_GREATER_THAN_ZERO"});
+                oCaptionParam.push({CODE: "INFO_POST_FAIL"});
+                oCaptionParam.push({CODE: "INFO_TOQTY_EQ_BALANCE"});
                 
                 oModel.create("/CaptionMsgSet", { CaptionMsgItems: oCaptionParam  }, {
                     method: "POST",
